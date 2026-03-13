@@ -1,0 +1,20 @@
+global_defs {
+  enable_script_security
+}
+
+{% for vlan in vlans %}
+vrrp_instance VI_{{ vlan.id }} {
+  state BACKUP
+  interface {{ bridge_name }}.{{ vlan.id }}
+  virtual_router_id {{ vlan.vrid }}
+  priority {{ vlan.priority }}
+  advert_int 1
+  authentication {
+    auth_type PASS
+    auth_pass labpass{{ vlan.id }}
+  }
+  virtual_ipaddress {
+    {{ vlan.vip }}
+  }
+}
+{% endfor %}

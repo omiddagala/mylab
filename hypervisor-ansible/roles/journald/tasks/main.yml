@@ -1,0 +1,17 @@
+---
+- name: Ensure persistent journal directory exists
+  ansible.builtin.file:
+    path: /var/log/journal
+    state: directory
+    owner: root
+    group: systemd-journal
+    mode: "2755"
+
+- name: Deploy journald config
+  ansible.builtin.template:
+    src: journald.conf.j2
+    dest: "{{ journald_config_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart journald

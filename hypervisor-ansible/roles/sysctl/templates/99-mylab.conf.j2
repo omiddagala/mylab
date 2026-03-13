@@ -1,0 +1,3 @@
+{% for key, value in effective_sysctl | dictsort %}
+{{ key }} = {{ value }}
+{% endfor %}

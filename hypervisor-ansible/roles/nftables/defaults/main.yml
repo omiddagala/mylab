@@ -1,0 +1,4 @@
+---
+nftables_enabled_default: true
+nftables_service_name: nftables
+nftables_config_path: /etc/nftables.conf

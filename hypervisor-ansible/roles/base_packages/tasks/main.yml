@@ -1,0 +1,20 @@
+---
+- name: Remove legacy/insecure packages
+  ansible.builtin.apt:
+    name: "{{ mylab_remove_packages }}"
+    state: absent
+    purge: true
+    update_cache: true
+
+- name: Install baseline packages
+  ansible.builtin.apt:
+    name: "{{ mylab_default_packages + mylab_default_packages_extra }}"
+    state: present
+    update_cache: true
+
+- name: Ensure qemu guest agent started on guests
+  ansible.builtin.service:
+    name: qemu-guest-agent
+    state: started
+    enabled: true
+  when: "'guests' in group_names"

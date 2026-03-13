@@ -1,0 +1,30 @@
+---
+- name: Ensure admin group exists
+  ansible.builtin.group:
+    name: "{{ mylab_admin_group }}"
+    state: present
+
+- name: Ensure ansible admin user exists
+  ansible.builtin.user:
+    name: "{{ mylab_ansible_user }}"
+    shell: /bin/bash
+    groups: "{{ mylab_ansible_groups | join(',') }}"
+    append: true
+    create_home: true
+    state: present
+
+- name: Install authorized SSH keys for ansible user
+  ansible.posix.authorized_key:
+    user: "{{ mylab_ansible_user }}"
+    key: "{{ item }}"
+    state: present
+  loop: "{{ mylab_admin_ssh_keys }}"
+
+- name: Install sudoers policy for ansible user
+  ansible.builtin.template:
+    src: sudoers-ansible.j2
+    dest: "/etc/sudoers.d/90-{{ mylab_ansible_user }}"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"

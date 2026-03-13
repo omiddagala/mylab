@@ -1,0 +1,7 @@
+---
+journald_config_path: /etc/systemd/journald.conf
+journald_service_name: systemd-journald
+journald_storage: persistent
+journald_compress: "yes"
+journald_seal: "yes"
+journald_forward_to_syslog: "no"

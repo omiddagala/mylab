@@ -1,0 +1,134 @@
+hosts:
+
+  bastion1.dc1.lab:
+    role: bastion
+    dc: dc1
+    ip: 10.10.10.10
+    vlan: management
+
+  r1-dc1.lab:
+    role: router
+    dc: dc1
+    ip: 10.10.50.1
+    loopback: 10.255.0.1
+
+  r2-dc1.lab:
+    role: router
+    dc: dc1
+    ip: 10.10.50.2
+    loopback: 10.255.0.2
+
+  leaf1-dc1.lab:
+    role: leaf
+    dc: dc1
+    ip: 10.10.50.11
+    loopback: 10.255.0.11
+
+  leaf2-dc1.lab:
+    role: leaf
+    dc: dc1
+    ip: 10.10.50.12
+    loopback: 10.255.0.12
+
+
+  r1-dc2.lab:
+    role: router
+    dc: dc2
+    ip: 10.20.50.1
+    loopback: 10.255.0.21
+
+  r2-dc2.lab:
+    role: router
+    dc: dc2
+    ip: 10.20.50.2
+    loopback: 10.255.0.22
+
+  leaf1-dc2.lab:
+    role: leaf
+    dc: dc2
+    ip: 10.20.50.11
+    loopback: 10.255.0.31
+
+  leaf2-dc2.lab:
+    role: leaf
+    dc: dc2
+    ip: 10.20.50.12
+    loopback: 10.255.0.32
+
+
+  prod1-cp1.dc1.lab:
+    role: k8s-master
+    cluster: prod1
+    ip: 10.10.20.11
+
+  prod1-cp2.dc1.lab:
+    role: k8s-master
+    cluster: prod1
+    ip: 10.10.20.12
+
+  prod1-w1.dc1.lab:
+    role: k8s-worker
+    cluster: prod1
+    ip: 10.10.20.21
+
+  prod1-w2.dc1.lab:
+    role: k8s-worker
+    cluster: prod1
+    ip: 10.10.20.22
+
+  prod1-w3.dc1.lab:
+    role: k8s-worker
+    cluster: prod1
+    ip: 10.10.20.23
+
+
+  dev-cp1.dc1.lab:
+    role: k8s-master
+    cluster: dev
+    ip: 10.10.30.11
+
+  dev-cp2.dc1.lab:
+    role: k8s-master
+    cluster: dev
+    ip: 10.10.30.12
+
+  dev-w1.dc1.lab:
+    role: k8s-worker
+    cluster: dev
+    ip: 10.10.30.21
+
+  dev-w2.dc1.lab:
+    role: k8s-worker
+    cluster: dev
+    ip: 10.10.30.22
+
+  dev-w3.dc1.lab:
+    role: k8s-worker
+    cluster: dev
+    ip: 10.10.30.23
+
+
+  prod2-cp1.dc2.lab:
+    role: k8s-master
+    cluster: prod2
+    ip: 10.20.20.11
+
+  prod2-cp2.dc2.lab:
+    role: k8s-master
+    cluster: prod2
+    ip: 10.20.20.12
+
+  prod2-w1.dc2.lab:
+    role: k8s-worker
+    cluster: prod2
+    ip: 10.20.20.21
+
+  prod2-w2.dc2.lab:
+    role: k8s-worker
+    cluster: prod2
+    ip: 10.20.20.22
+
+  prod2-w3.dc2.lab:
+    role: k8s-worker
+    cluster: prod2
+    ip: 10.20.20.23

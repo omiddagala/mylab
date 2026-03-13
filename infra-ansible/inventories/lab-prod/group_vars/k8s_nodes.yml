@@ -1,0 +1,11 @@
+k8s_packages:
+  - containerd
+  - open-iscsi
+  - nfs-common
+  - conntrack
+  - socat
+  - ethtool
+  - ipset
+  - ebtables
+  - apt-transport-https
+  - ca-certificates

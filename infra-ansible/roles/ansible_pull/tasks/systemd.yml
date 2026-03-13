@@ -1,0 +1,24 @@
+---
+- name: Install ansible-pull service unit
+  template:
+    src: ansible-pull.service.j2
+    dest: /etc/systemd/system/ansible-pull.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reload systemd
+
+- name: Install ansible-pull timer unit
+  template:
+    src: ansible-pull.timer.j2
+    dest: /etc/systemd/system/ansible-pull.timer
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reload systemd
+
+- name: Enable ansible-pull timer
+  systemd:
+    name: ansible-pull.timer
+    enabled: true
+    state: started

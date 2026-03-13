@@ -1,0 +1,18 @@
+---
+- name: Install FRR and keepalived
+  apt:
+    name:
+      - frr
+      - frr-pythontools
+      - keepalived
+    state: present
+    update_cache: true
+
+- name: Enable needed FRR daemons
+  template:
+    src: frr-daemons.j2
+    dest: /etc/frr/daemons
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart FRR

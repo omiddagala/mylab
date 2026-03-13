@@ -1,0 +1,4 @@
+---
+- import_playbook: hypervisors.yml
+- import_playbook: hypervisor-vms.yml
+- import_playbook: guests.yml

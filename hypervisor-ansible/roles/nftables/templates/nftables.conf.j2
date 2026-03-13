@@ -1,0 +1,42 @@
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+table inet filter {
+  chain input {
+    type filter hook input priority 0;
+    policy drop;
+
+    iif "lo" accept
+    ct state established,related accept
+    ct state invalid drop
+
+{% if mylab_nft_allow_icmp %}
+    ip protocol icmp accept
+    ip6 nexthdr icmpv6 accept
+{% endif %}
+
+{% for cidr in mylab_mgmt_cidrs %}
+    ip saddr {{ cidr }} tcp dport 22 accept
+{% endfor %}
+
+{% for port in (hostvars[inventory_hostname].nft_extra_tcp_in | default(mylab_nft_extra_tcp_in)) %}
+    tcp dport {{ port }} accept
+{% endfor %}
+
+{% for port in (hostvars[inventory_hostname].nft_extra_udp_in | default(mylab_nft_extra_udp_in)) %}
+    udp dport {{ port }} accept
+{% endfor %}
+  }
+
+  chain forward {
+    type filter hook forward priority 0;
+    policy drop;
+    ct state established,related accept
+  }
+
+  chain output {
+    type filter hook output priority 0;
+    policy accept;
+  }
+}

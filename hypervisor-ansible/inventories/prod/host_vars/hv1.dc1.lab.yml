@@ -1,0 +1,238 @@
+---
+mylab_site: dc1
+
+hypervisor_bridges:
+  - name: br-mgmt-dc1
+    # management / bastion / hypervisor access
+    address: 10.10.10.11/24
+    gateway4: 10.10.10.1
+    dns_servers:
+      - 10.10.10.10
+      - 10.20.10.10
+    physical_nic: eno1
+
+  - name: br-underlay-dc1
+    physical_nic: eno2
+
+  - name: br-prod1
+    physical_nic: null
+
+  - name: br-dev
+    physical_nic: null
+
+hypervisor_vms:
+  - name: bastion1.dc1.lab
+    vcpus: 2
+    memory_mb: 4096
+    disk_gb: 40
+    role: bastion
+    rp_filter_mode: 1
+    allow_tcp_forwarding: "yes"
+    nft_extra_tcp_in:
+      - 443
+    nics:
+      - bridge: br-mgmt-dc1
+        mac: "52:54:00:10:10:10"
+        address: 10.10.10.10/24
+        gateway4: 10.10.10.1
+        nameservers:
+          - 10.10.10.10
+          - 10.20.10.10
+
+  - name: r1-dc1.lab
+    vcpus: 2
+    memory_mb: 4096
+    disk_gb: 20
+    role: router
+    rp_filter_mode: 0
+    nft_enabled: false
+    nics:
+      - bridge: br-underlay-dc1
+        mac: "52:54:00:10:00:01"
+        address: 10.10.0.1/24
+
+  - name: r2-dc1.lab
+    vcpus: 2
+    memory_mb: 4096
+    disk_gb: 20
+    role: router
+    rp_filter_mode: 0
+    nft_enabled: false
+    nics:
+      - bridge: br-underlay-dc1
+        mac: "52:54:00:10:00:02"
+        address: 10.10.0.2/24
+
+  - name: leaf1-dc1.lab
+    vcpus: 2
+    memory_mb: 4096
+    disk_gb: 20
+    role: leaf
+    rp_filter_mode: 0
+    nft_enabled: false
+    nics:
+      - bridge: br-underlay-dc1
+        mac: "52:54:00:10:00:11"
+        address: 10.10.0.11/24
+
+  - name: leaf2-dc1.lab
+    vcpus: 2
+    memory_mb: 4096
+    disk_gb: 20
+    role: leaf
+    rp_filter_mode: 0
+    nft_enabled: false
+    nics:
+      - bridge: br-underlay-dc1
+        mac: "52:54:00:10:00:12"
+        address: 10.10.0.12/24
+
+  - name: prod1-cp1.dc1.lab
+    vcpus: 4
+    memory_mb: 8192
+    disk_gb: 80
+    role: k8s-control-plane
+    rp_filter_mode: 2
+    nics:
+      - bridge: br-prod1
+        mac: "52:54:00:10:11:11"
+        address: 10.10.110.11/24
+        gateway4: 10.10.110.1
+        nameservers:
+          - 10.10.10.10
+          - 10.20.10.10
+
+  - name: prod1-cp2.dc1.lab
+    vcpus: 4
+    memory_mb: 8192
+    disk_gb: 80
+    role: k8s-control-plane
+    rp_filter_mode: 2
+    nics:
+      - bridge: br-prod1
+        mac: "52:54:00:10:11:12"
+        address: 10.10.110.12/24
+        gateway4: 10.10.110.1
+        nameservers:
+          - 10.10.10.10
+          - 10.20.10.10
+
+  - name: prod1-w1.dc1.lab
+    vcpus: 4
+    memory_mb: 8192
+    disk_gb: 80
+    role: k8s-worker
+    rp_filter_mode: 2
+    nics:
+      - bridge: br-prod1
+        mac: "52:54:00:10:11:21"
+        address: 10.10.110.21/24
+        gateway4: 10.10.110.1
+        nameservers:
+          - 10.10.10.10
+          - 10.20.10.10
+
+  - name: prod1-w2.dc1.lab
+    vcpus: 4
+    memory_mb: 8192
+    disk_gb: 80
+    role: k8s-worker
+    rp_filter_mode: 2
+    nics:
+      - bridge: br-prod1
+        mac: "52:54:00:10:11:22"
+        address: 10.10.110.22/24
+        gateway4: 10.10.110.1
+        nameservers:
+          - 10.10.10.10
+          - 10.20.10.10
+
+  - name: prod1-w3.dc1.lab
+    vcpus: 4
+    memory_mb: 8192
+    disk_gb: 80
+    role: k8s-worker
+    rp_filter_mode: 2
+    nics:
+      - bridge: br-prod1
+        mac: "52:54:00:10:11:23"
+        address: 10.10.110.23/24
+        gateway4: 10.10.110.1
+        nameservers:
+          - 10.10.10.10
+          - 10.20.10.10
+
+  - name: dev-cp1.dc1.lab
+    vcpus: 4
+    memory_mb: 8192
+    disk_gb: 80
+    role: k8s-control-plane
+    rp_filter_mode: 2
+    nics:
+      - bridge: br-dev
+        mac: "52:54:00:10:12:11"
+        address: 10.10.120.11/24
+        gateway4: 10.10.120.1
+        nameservers:
+          - 10.10.10.10
+          - 10.20.10.10
+
+  - name: dev-cp2.dc1.lab
+    vcpus: 4
+    memory_mb: 8192
+    disk_gb: 80
+    role: k8s-control-plane
+    rp_filter_mode: 2
+    nics:
+      - bridge: br-dev
+        mac: "52:54:00:10:12:12"
+        address: 10.10.120.12/24
+        gateway4: 10.10.120.1
+        nameservers:
+          - 10.10.10.10
+          - 10.20.10.10
+
+  - name: dev-w1.dc1.lab
+    vcpus: 4
+    memory_mb: 8192
+    disk_gb: 80
+    role: k8s-worker
+    rp_filter_mode: 2
+    nics:
+      - bridge: br-dev
+        mac: "52:54:00:10:12:21"
+        address: 10.10.120.21/24
+        gateway4: 10.10.120.1
+        nameservers:
+          - 10.10.10.10
+          - 10.20.10.10
+
+  - name: dev-w2.dc1.lab
+    vcpus: 4
+    memory_mb: 8192
+    disk_gb: 80
+    role: k8s-worker
+    rp_filter_mode: 2
+    nics:
+      - bridge: br-dev
+        mac: "52:54:00:10:12:22"
+        address: 10.10.120.22/24
+        gateway4: 10.10.120.1
+        nameservers:
+          - 10.10.10.10
+          - 10.20.10.10
+
+  - name: dev-w3.dc1.lab
+    vcpus: 4
+    memory_mb: 8192
+    disk_gb: 80
+    role: k8s-worker
+    rp_filter_mode: 2
+    nics:
+      - bridge: br-dev
+        mac: "52:54:00:10:12:23"
+        address: 10.10.120.23/24
+        gateway4: 10.10.120.1
+        nameservers:
+          - 10.10.10.10
+          - 10.20.10.10

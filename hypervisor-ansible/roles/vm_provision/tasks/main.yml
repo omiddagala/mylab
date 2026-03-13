@@ -1,0 +1,133 @@
+---
+- name: Ensure VM directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "{{ mylab_vm_storage_dir }}"
+    - "{{ mylab_vm_image_cache_dir }}"
+    - "{{ mylab_vm_cloudinit_dir }}"
+
+- name: Download Debian cloud image
+  ansible.builtin.get_url:
+    url: "{{ mylab_debian_cloud_image_url }}"
+    dest: "{{ vm_provision_base_image_path }}"
+    mode: "0644"
+    force: false
+
+- name: Ensure per-VM cloud-init directories exist
+  ansible.builtin.file:
+    path: "{{ mylab_vm_cloudinit_dir }}/{{ item.name }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop: "{{ hypervisor_vms | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Create qcow2 disks for VMs if absent
+  ansible.builtin.command:
+    cmd: >
+      qemu-img create -f qcow2
+      -F qcow2
+      -b {{ vm_provision_base_image_path }}
+      {{ mylab_vm_storage_dir }}/{{ item.name }}.qcow2
+      {{ item.disk_gb | default(mylab_guest_default_disk_gb) }}G
+    creates: "{{ mylab_vm_storage_dir }}/{{ item.name }}.qcow2"
+  loop: "{{ hypervisor_vms | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Render cloud-init meta-data
+  ansible.builtin.template:
+    src: meta-data.j2
+    dest: "{{ mylab_vm_cloudinit_dir }}/{{ item.name }}/meta-data"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ hypervisor_vms | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Render cloud-init user-data
+  ansible.builtin.template:
+    src: user-data.j2
+    dest: "{{ mylab_vm_cloudinit_dir }}/{{ item.name }}/user-data"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ hypervisor_vms | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Render cloud-init network-config
+  ansible.builtin.template:
+    src: network-config.j2
+    dest: "{{ mylab_vm_cloudinit_dir }}/{{ item.name }}/network-config"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ hypervisor_vms | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Build seed ISO
+  ansible.builtin.command:
+    cmd: >
+      cloud-localds
+      -N {{ mylab_vm_cloudinit_dir }}/{{ item.name }}/network-config
+      {{ mylab_vm_cloudinit_dir }}/{{ item.name }}/seed.iso
+      {{ mylab_vm_cloudinit_dir }}/{{ item.name }}/user-data
+      {{ mylab_vm_cloudinit_dir }}/{{ item.name }}/meta-data
+  loop: "{{ hypervisor_vms | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Check if VM already exists
+  ansible.builtin.command:
+    cmd: "virsh dominfo {{ item.name }}"
+  register: virsh_dominfo
+  failed_when: false
+  changed_when: false
+  loop: "{{ hypervisor_vms | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Define and start missing VMs
+  ansible.builtin.command:
+    cmd: >
+      virt-install
+      --connect {{ mylab_libvirt_uri }}
+      --name {{ item.item.name }}
+      --memory {{ item.item.memory_mb | default(mylab_guest_default_memory_mb) }}
+      --vcpus {{ item.item.vcpus | default(mylab_guest_default_vcpus) }}
+      --cpu host-passthrough
+      --import
+      --os-variant {{ mylab_vm_os_variant }}
+      --graphics none
+      --noautoconsole
+      --serial pty
+      --console {{ vm_provision_default_console }}
+      --disk path={{ mylab_vm_storage_dir }}/{{ item.item.name }}.qcow2,format=qcow2,bus=virtio
+      --disk path={{ mylab_vm_cloudinit_dir }}/{{ item.item.name }}/seed.iso,device=cdrom
+      {% for nic in item.item.nics %}
+      --network bridge={{ nic.bridge }},model=virtio,mac={{ nic.mac }}
+      {% endfor %}
+  when: item.rc != 0
+  loop: "{{ virsh_dominfo.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+
+- name: Ensure VMs are running
+  community.libvirt.virt:
+    name: "{{ item.name }}"
+    state: running
+    autostart: true
+    uri: "{{ mylab_libvirt_uri }}"
+  loop: "{{ hypervisor_vms | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"

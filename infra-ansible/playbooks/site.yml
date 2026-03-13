@@ -1,0 +1,33 @@
+- name: Full convergence
+  hosts: all
+  become: true
+  roles:
+    - common
+    - resolver
+    - chrony
+    - ssh_hardening
+    - nftables
+
+- name: Configure base network
+  hosts: routers:leaves:k8s_nodes
+  become: true
+  roles:
+    - base_network
+
+- name: Configure routing
+  hosts: routers:leaves
+  become: true
+  roles:
+    - frr
+
+- name: Configure ansible-pull
+  hosts: all:!bastion1.dc1.lab
+  become: true
+  roles:
+    - ansible_pull
+
+- name: Kubernetes prerequisites
+  hosts: k8s_nodes
+  become: true
+  roles:
+    - common

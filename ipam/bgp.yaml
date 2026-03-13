@@ -1,0 +1,30 @@
+bgp:
+
+  routers:
+
+    r1-dc1:
+      asn: 65001
+      loopback: 10.255.0.1
+
+    r2-dc1:
+      asn: 65001
+      loopback: 10.255.0.2
+
+    r1-dc2:
+      asn: 65002
+      loopback: 10.255.0.21
+
+    r2-dc2:
+      asn: 65002
+      loopback: 10.255.0.22
+
+
+  route_reflectors:
+
+    dc1:
+      - r1-dc1
+      - r2-dc1
+
+    dc2:
+      - r1-dc2
+      - r2-dc2

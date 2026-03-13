@@ -1,0 +1,25 @@
+---
+mylab_host_role: hypervisor
+
+mylab_default_packages_extra:
+  - qemu-kvm
+  - libvirt-daemon-system
+  - libvirt-clients
+  - virtinst
+  - cloud-image-utils
+  - libguestfs-tools
+  - bridge-utils
+  - python3-libvirt
+  - python3-lxml
+  - qemu-utils
+
+mylab_sysctl_overrides:
+  net.ipv4.ip_forward: 1
+
+mylab_rp_filter_mode: 0
+
+mylab_nft_extra_tcp_in:
+  - 16509
+
+mylab_allow_tcp_forwarding: "yes"
+mylab_allow_agent_forwarding: "no"

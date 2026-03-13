@@ -1,0 +1,5 @@
+- name: Configure interfaces and VLANs
+  hosts: routers:leaves:k8s_nodes
+  become: true
+  roles:
+    - base_network

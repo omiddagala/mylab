@@ -1,0 +1,108 @@
+---
+mylab_domain: lab
+mylab_timezone: Europe/Amsterdam
+
+mylab_ntp_servers:
+  - 0.nl.pool.ntp.org
+  - 1.nl.pool.ntp.org
+  - 2.nl.pool.ntp.org
+  - 3.nl.pool.ntp.org
+
+mylab_dns_servers:
+  - 10.10.10.10
+  - 10.20.10.10
+
+mylab_bastion_ip: 10.10.10.10
+mylab_mgmt_cidrs:
+  - 10.10.10.0/24
+  - 10.20.10.0/24
+
+mylab_admin_group: ssh-admins
+mylab_ansible_user: ansible
+mylab_ansible_groups:
+  - sudo
+  - "{{ mylab_admin_group }}"
+
+mylab_admin_ssh_keys:
+  - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEXAMPLE_REPLACE_WITH_REAL_KEY omid@mylab"
+
+mylab_disable_password_auth: true
+mylab_disable_root_ssh: true
+mylab_allow_tcp_forwarding: "no"
+mylab_allow_agent_forwarding: "no"
+mylab_permit_tunnel: "no"
+mylab_x11_forwarding: "no"
+
+mylab_unattended_upgrades: true
+mylab_reboot_if_required: false
+
+mylab_journald_system_max_use: 1G
+mylab_journald_runtime_max_use: 256M
+
+mylab_default_packages:
+  - qemu-guest-agent
+  - curl
+  - wget
+  - vim
+  - rsync
+  - sudo
+  - ca-certificates
+  - gnupg
+  - lsof
+  - jq
+  - unzip
+  - tcpdump
+  - ethtool
+  - htop
+  - dnsutils
+  - nftables
+  - chrony
+  - auditd
+  - apparmor
+  - apparmor-utils
+
+mylab_remove_packages:
+  - telnet
+  - rsh-client
+  - rsh-redone-client
+  - nis
+
+mylab_sysctl:
+  net.ipv4.ip_forward: 0
+  net.ipv4.conf.all.accept_redirects: 0
+  net.ipv4.conf.default.accept_redirects: 0
+  net.ipv4.conf.all.send_redirects: 0
+  net.ipv4.conf.default.send_redirects: 0
+  net.ipv4.conf.all.accept_source_route: 0
+  net.ipv4.conf.default.accept_source_route: 0
+  net.ipv4.icmp_echo_ignore_broadcasts: 1
+  net.ipv4.icmp_ignore_bogus_error_responses: 1
+  net.ipv4.tcp_syncookies: 1
+  net.ipv4.conf.all.log_martians: 1
+  net.ipv6.conf.all.accept_redirects: 0
+  net.ipv6.conf.default.accept_redirects: 0
+  kernel.kptr_restrict: 2
+  kernel.dmesg_restrict: 1
+  fs.protected_hardlinks: 1
+  fs.protected_symlinks: 1
+  vm.swappiness: 10
+  vm.max_map_count: 262144
+
+mylab_rp_filter_mode: 1
+
+mylab_nft_allow_icmp: true
+mylab_nft_extra_tcp_in: []
+mylab_nft_extra_udp_in: []
+
+mylab_guest_default_memory_mb: 8192
+mylab_guest_default_vcpus: 2
+mylab_guest_default_disk_gb: 40
+
+mylab_debian_cloud_image_url: "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
+mylab_debian_cloud_image_sha256: ""
+mylab_vm_storage_dir: /var/lib/libvirt/images/mylab
+mylab_vm_image_cache_dir: /var/lib/mylab/images
+mylab_vm_cloudinit_dir: /var/lib/mylab/cloudinit
+mylab_vm_os_variant: debian12
+
+mylab_libvirt_uri: qemu:///system

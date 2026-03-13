@@ -1,0 +1,4 @@
+host_role: bastion
+primary_interface: eth0
+mgmt_ip: 10.10.10.10/24
+mgmt_gw: 10.10.10.1

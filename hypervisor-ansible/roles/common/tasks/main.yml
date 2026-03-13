@@ -1,0 +1,24 @@
+---
+- name: Ensure hostname is set
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Ensure /etc/hosts has local hostname entry
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1\s+'
+    line: "127.0.1.1 {{ inventory_hostname }} {{ inventory_hostname_short }}"
+    create: true
+
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ mylab_timezone }}"
+
+- name: Ensure important services are enabled
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: true
+  loop:
+    - ssh
+    - systemd-timesyncd
+  ignore_errors: true

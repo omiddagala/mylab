@@ -1,0 +1,98 @@
+- name: Ensure ifupdown2 and bridge/vlan tools are installed
+  apt:
+    name:
+      - ifupdown2
+      - vlan
+      - bridge-utils
+    state: present
+    update_cache: true
+
+- name: Render interfaces file for bastion and standard hosts
+  when: host_role in ['bastion', 'router']
+  copy:
+    dest: /etc/network/interfaces
+    mode: '0644'
+    content: |
+      auto lo
+      iface lo inet loopback
+
+      auto {{ primary_interface }}
+      iface {{ primary_interface }} inet static
+          address {{ mgmt_ip }}
+          gateway {{ mgmt_gw | default(omit) }}
+
+      {% if loopback_ip is defined %}
+      auto lo:1
+      iface lo:1 inet static
+          address {{ loopback_ip }}
+      {% endif %}
+
+      {% if transit_interfaces is defined %}
+      {% for iface in transit_interfaces %}
+      auto {{ iface.name }}
+      iface {{ iface.name }} inet static
+          address {{ iface.ip }}
+      {% endfor %}
+      {% endif %}
+
+- name: Render interfaces file for leaves
+  when: host_role == 'leaf'
+  copy:
+    dest: /etc/network/interfaces
+    mode: '0644'
+    content: |
+      auto lo
+      iface lo inet loopback
+
+      auto {{ primary_interface }}
+      iface {{ primary_interface }} inet static
+          address {{ mgmt_ip }}
+          gateway {{ mgmt_gw }}
+
+      auto lo:1
+      iface lo:1 inet static
+          address {{ loopback_ip }}
+
+      {% for iface in transit_interfaces %}
+      auto {{ iface.name }}
+      iface {{ iface.name }} inet static
+          address {{ iface.ip }}
+      {% endfor %}
+
+      auto {{ bridge_name }}
+      iface {{ bridge_name }} inet manual
+          bridge_ports {{ trunk_interface }}
+          bridge_stp off
+          bridge_fd 0
+          bridge_vlan_aware yes
+
+      {% for vlan in vlans %}
+      auto {{ bridge_name }}.{{ vlan.id }}
+      iface {{ bridge_name }}.{{ vlan.id }} inet static
+          address {{ vlan.svi }}
+          vlan-raw-device {{ bridge_name }}
+      {% endfor %}
+
+- name: Render interfaces file for Kubernetes nodes
+  when: "'k8s' in (host_role | default('')) or 'k8s' in (hostvars[inventory_hostname].roles | default([]))"
+  ignore_errors: true
+  copy:
+    dest: /etc/network/interfaces
+    mode: '0644'
+    content: |
+      auto lo
+      iface lo inet loopback
+
+      auto eth0
+      iface eth0 inet static
+          address {{ mgmt_ip }}
+          gateway {{ mgmt_gw }}
+
+      auto eth1
+      iface eth1 inet static
+          address {{ node_ip }}
+
+- name: Restart networking
+  service:
+    name: networking
+    state: restarted

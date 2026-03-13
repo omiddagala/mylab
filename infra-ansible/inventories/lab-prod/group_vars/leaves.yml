@@ -1,0 +1,3 @@
+frr_bgp_asn: 65100
+frr_ospf_enabled: true
+router_role: leaf

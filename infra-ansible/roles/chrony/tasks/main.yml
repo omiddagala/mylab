@@ -1,0 +1,17 @@
+- name: Configure chrony
+  copy:
+    dest: /etc/chrony/chrony.conf
+    content: |
+      pool pool.ntp.org iburst
+      allow 10.10.0.0/16
+      allow 10.20.0.0/16
+      makestep 1 3
+      driftfile /var/lib/chrony/chrony.drift
+      rtcsync
+      logdir /var/log/chrony
+
+- name: Enable chrony
+  service:
+    name: chrony
+    state: restarted
+    enabled: true

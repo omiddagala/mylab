@@ -1,0 +1,15 @@
+[Unit]
+Description=Periodic ansible-pull convergence
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/infra-ansible
+ExecStart=/usr/bin/ansible-pull \
+  -U ssh://git@git1.dc1.lab/lab/infra-ansible.git \
+  -C main \
+  -i inventories/lab-prod/hosts.yml \
+  -l %H \
+  playbooks/site.yml

@@ -1,0 +1,13 @@
+---
+- name: Restart FRR
+  service:
+    name: frr
+    state: restarted
+    enabled: true
+
+- name: Restart keepalived
+  when: host_role == 'leaf'
+  service:
+    name: keepalived
+    state: restarted
+    enabled: true

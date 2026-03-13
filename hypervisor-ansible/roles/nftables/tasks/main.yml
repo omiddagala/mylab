@@ -1,0 +1,21 @@
+---
+- name: Decide nftables enablement for current host
+  ansible.builtin.set_fact:
+    nft_enabled_effective: "{{ hostvars[inventory_hostname].nft_enabled | default(nftables_enabled_default) | bool }}"
+
+- name: Deploy nftables policy
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: "{{ nftables_config_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: nft_enabled_effective
+  notify: Restart nftables
+
+- name: Ensure nftables is enabled and started
+  ansible.builtin.service:
+    name: "{{ nftables_service_name }}"
+    enabled: true
+    state: started
+  when: nft_enabled_effective

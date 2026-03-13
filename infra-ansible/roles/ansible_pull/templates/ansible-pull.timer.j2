@@ -1,0 +1,10 @@
+[Unit]
+Description=Run ansible-pull periodically
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec={{ ansible_pull_interval }}
+Persistent=true
+
+[Install]
+WantedBy=timers.target

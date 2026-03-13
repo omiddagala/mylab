@@ -1,0 +1,29 @@
+vlans:
+
+  management:
+    id: 10
+    description: management network
+
+  prod1:
+    id: 20
+    description: prod1 kubernetes nodes
+
+  prod2:
+    id: 30
+    description: prod2 kubernetes nodes
+
+  dev:
+    id: 40
+    description: dev kubernetes nodes
+
+  storage:
+    id: 50
+    description: storage network
+
+  dmz:
+    id: 60
+    description: dmz services
+
+  infra:
+    id: 70
+    description: routers and switches infra

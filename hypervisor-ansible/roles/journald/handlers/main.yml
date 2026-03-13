@@ -1,0 +1,5 @@
+---
+- name: Restart journald
+  ansible.builtin.service:
+    name: "{{ journald_service_name }}"
+    state: restarted

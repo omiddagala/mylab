@@ -1,0 +1,20 @@
+---
+- name: Render FRR config for leaves
+  when: host_role == 'leaf'
+  template:
+    src: frr-leaf.conf.j2
+    dest: /etc/frr/frr.conf
+    owner: frr
+    group: frr
+    mode: "0640"
+  notify: Restart FRR
+
+- name: Render FRR config for routers
+  when: host_role == 'router'
+  template:
+    src: frr-router.conf.j2
+    dest: /etc/frr/frr.conf
+    owner: frr
+    group: frr
+    mode: "0640"
+  notify: Restart FRR

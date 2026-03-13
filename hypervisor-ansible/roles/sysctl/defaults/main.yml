@@ -1,0 +1,3 @@
+---
+sysctl_config_path: /etc/sysctl.d/99-mylab.conf
+sysctl_apply_command: sysctl --system

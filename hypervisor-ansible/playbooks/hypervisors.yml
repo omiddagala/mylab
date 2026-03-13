@@ -1,0 +1,17 @@
+---
+- name: Prepare hypervisors
+  hosts: hypervisors
+  become: true
+  gather_facts: true
+
+  roles:
+    - common
+    - base_packages
+    - users
+    - sshd
+    - journald
+    - timesync
+    - unattended_upgrades
+    - sysctl
+    - nftables
+    - libvirt_host

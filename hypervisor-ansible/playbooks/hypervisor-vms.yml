@@ -1,0 +1,8 @@
+---
+- name: Provision VMs on hypervisors
+  hosts: hypervisors
+  become: true
+  gather_facts: true
+
+  roles:
+    - vm_provision

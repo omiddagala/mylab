@@ -1,0 +1,51 @@
+---
+- name: Build effective sysctl map
+  ansible.builtin.set_fact:
+    effective_sysctl: >-
+      {{
+        mylab_sysctl
+        | combine({
+            'net.ipv4.conf.all.rp_filter': (hostvars[inventory_hostname].rp_filter_mode | default(mylab_rp_filter_mode))
+          })
+        | combine({
+            'net.ipv4.conf.default.rp_filter': (hostvars[inventory_hostname].rp_filter_mode | default(mylab_rp_filter_mode))
+          })
+        | combine(mylab_sysctl_overrides | default({}))
+      }}
+
+- name: Enable Kubernetes bridge filtering for K8s nodes
+  ansible.builtin.set_fact:
+    effective_sysctl: >-
+      {{
+        effective_sysctl
+        | combine({
+            'net.bridge.bridge-nf-call-iptables': 1,
+            'net.bridge.bridge-nf-call-ip6tables': 1,
+            'net.ipv4.ip_forward': 1
+          })
+      }}
+  when: "'kubernetes_control_plane' in group_names or 'kubernetes_workers' in group_names"
+
+- name: Ensure br_netfilter is loaded for K8s nodes
+  community.general.modprobe:
+    name: br_netfilter
+    state: present
+  when: "'kubernetes_control_plane' in group_names or 'kubernetes_workers' in group_names"
+
+- name: Ensure overlay is loaded for K8s nodes
+  community.general.modprobe:
+    name: overlay
+    state: present
+  when: "'kubernetes_control_plane' in group_names or 'kubernetes_workers' in group_names"
+
+- name: Deploy sysctl config
+  ansible.builtin.template:
+    src: 99-mylab.conf.j2
+    dest: "{{ sysctl_config_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Apply sysctl settings
+  ansible.builtin.command: "{{ sysctl_apply_command }}"
+  changed_when: true

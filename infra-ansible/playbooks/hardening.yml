@@ -1,0 +1,6 @@
+- name: Apply hardening
+  hosts: all
+  become: true
+  roles:
+    - ssh_hardening
+    - nftables

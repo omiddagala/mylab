@@ -1,0 +1,34 @@
+---
+- name: Ensure libvirt service is started and enabled
+  ansible.builtin.service:
+    name: "{{ libvirt_service_name }}"
+    state: started
+    enabled: true
+
+- name: Ensure storage directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "{{ mylab_vm_storage_dir }}"
+    - "{{ mylab_vm_image_cache_dir }}"
+    - "{{ mylab_vm_cloudinit_dir }}"
+
+- name: Disable libvirt default network if requested
+  community.libvirt.virt_net:
+    command: destroy
+    name: default
+    uri: "{{ mylab_libvirt_uri }}"
+  ignore_errors: true
+  when: libvirt_disable_default_network | bool
+
+- name: Disable libvirt default network autostart if requested
+  community.libvirt.virt_net:
+    autostart: false
+    name: default
+    uri: "{{ mylab_libvirt_uri }}"
+  ignore_errors: true
+  when: libvirt_disable_default_network | bool

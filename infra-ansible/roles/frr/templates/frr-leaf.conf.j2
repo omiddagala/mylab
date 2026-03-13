@@ -1,0 +1,44 @@
+frr version 8.4
+frr defaults traditional
+hostname {{ inventory_hostname }}
+service integrated-vtysh-config
+log syslog informational
+
+ip forwarding
+
+interface lo
+ ip address {{ loopback_ip }}
+!
+{% for iface in transit_interfaces %}
+interface {{ iface.name }}
+ ip address {{ iface.ip }}
+!
+{% endfor %}
+{% for vlan in vlans %}
+interface {{ bridge_name }}.{{ vlan.id }}
+ ip address {{ vlan.svi }}
+!
+{% endfor %}
+
+router ospf
+ ospf router-id {{ frr_router_id }}
+ passive-interface lo
+{% for iface in transit_interfaces %}
+ network {{ iface.ip.split('/')[0] }}/32 area 0
+{% endfor %}
+!
+
+router bgp 65100
+ bgp router-id {{ frr_router_id }}
+ neighbor UPLINK peer-group
+ neighbor UPLINK remote-as external
+{% for iface in transit_interfaces %}
+ neighbor {{ iface.ip.split('/')[0] }} interface peer-group UPLINK
+{% endfor %}
+ address-family ipv4 unicast
+  network {{ loopback_ip.split('/')[0] }}/32
+{% for vlan in vlans %}
+  network {{ vlan.svi.split('/')[0] }}/32
+{% endfor %}
+ exit-address-family
+!

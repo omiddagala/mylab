@@ -1,0 +1,24 @@
+lab_domain: lab
+
+datacenters:
+  dc1:
+    name: datacenter1
+    asn: 65101
+
+  dc2:
+    name: datacenter2
+    asn: 65102
+
+loopback_range: 10.255.0.0/24
+
+router_asn: 65000
+leaf_asn: 65100
+
+dns:
+  domain: lab
+  upstream:
+    - 1.1.1.1
+    - 8.8.8.8
+
+ntp:
+  - pool.ntp.org

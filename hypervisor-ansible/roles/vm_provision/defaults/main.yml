@@ -1,0 +1,5 @@
+---
+vm_provision_base_image_filename: debian-12-genericcloud-amd64.qcow2
+vm_provision_base_image_path: "{{ mylab_vm_image_cache_dir }}/{{ vm_provision_base_image_filename }}"
+vm_provision_cloudinit_manage_etc_hosts: true
+vm_provision_default_console: "pty,target_type=serial"

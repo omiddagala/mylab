@@ -1,0 +1,43 @@
+#cloud-config
+hostname: {{ item.name }}
+fqdn: {{ item.name }}
+manage_etc_hosts: {{ vm_provision_cloudinit_manage_etc_hosts | bool | lower }}
+
+users:
+  - default
+  - name: {{ mylab_ansible_user }}
+    gecos: mylab ansible
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo
+    ssh_authorized_keys:
+{% for key in mylab_admin_ssh_keys %}
+      - {{ key }}
+{% endfor %}
+
+disable_root: true
+ssh_pwauth: false
+package_update: true
+package_upgrade: false
+
+packages:
+  - qemu-guest-agent
+  - sudo
+  - curl
+  - vim
+  - nftables
+
+write_files:
+  - path: /etc/motd
+    permissions: '0644'
+    content: |
+      Authorized access only.
+      Host: {{ item.name }}
+      Role: {{ item.role }}
+
+runcmd:
+  - systemctl enable qemu-guest-agent
+  - systemctl start qemu-guest-agent
+  - timedatectl set-timezone {{ mylab_timezone }}
+  - sysctl -w net.ipv4.conf.all.rp_filter={{ item.rp_filter_mode | default(mylab_rp_filter_mode) }}
+  - sysctl -w net.ipv4.conf.default.rp_filter={{ item.rp_filter_mode | default(mylab_rp_filter_mode) }}

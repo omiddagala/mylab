@@ -1,0 +1,4 @@
+---
+sshd_service_name: ssh
+sshd_config_path: /etc/ssh/sshd_config
+sshd_config_mode: "0600"

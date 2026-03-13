@@ -1,0 +1,12 @@
+[Unit]
+Description=Ansible Pull Configuration Management
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory={{ ansible_pull_workdir }}
+ExecStart=/usr/bin/ansible-pull \
+  -U {{ ansible_pull_repo }} \
+  -C {{ ansible_pull_branch }} \
+  -d {{ ansible_pull_workdir }} \
+  {{ ansible_pull_playbook }}

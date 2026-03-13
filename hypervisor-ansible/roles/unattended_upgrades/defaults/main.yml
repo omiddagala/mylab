@@ -1,0 +1,9 @@
+---
+unattended_upgrades_packages:
+  - unattended-upgrades
+  - apt-listchanges
+
+unattended_auto_upgrades_path: /etc/apt/apt.conf.d/20auto-upgrades
+unattended_config_path: /etc/apt/apt.conf.d/50unattended-upgrades
+unattended_service_name: unattended-upgrades
+unattended_reboot_time: "03:30"
