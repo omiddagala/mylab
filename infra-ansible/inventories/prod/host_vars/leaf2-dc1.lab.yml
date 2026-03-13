@@ -1,0 +1,13 @@
+mgmt_interface: ens18
+mgmt_ip_cidr: 10.10.0.32/24
+mgmt_gateway: 10.10.0.1
+leaf_bridges:
+  - name: br-fabric
+    ports: [ens19, ens20, ens21]
+leaf_vlans:
+  - id: 110
+    name: prod1-node
+leaf_svis:
+  - name: br-fabric.110
+    raw_device: br-fabric
+    address: 10.110.0.3/24

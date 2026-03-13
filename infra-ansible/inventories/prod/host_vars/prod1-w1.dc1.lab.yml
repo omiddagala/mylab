@@ -1,0 +1,6 @@
+mgmt_interface: ens18
+mgmt_ip_cidr: 10.10.0.22/24
+mgmt_gateway: 10.10.0.1
+k8s_node_labels:
+  topology.kubernetes.io/zone: dc1
+  node-role.kubernetes.io/worker: ""

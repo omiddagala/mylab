@@ -1,5 +1,0 @@
-- name: Configure FRR
-  hosts: routers:leaves
-  become: true
-  roles:
-    - frr

@@ -1,0 +1,31 @@
+frr version 8.4
+frr defaults {{ frr_defaults_mode }}
+hostname {{ inventory_hostname_short }}
+service integrated-vtysh-config
+!
+router bgp {{ frr_bgp_asn }}
+ bgp router-id {{ frr_router_id }}
+ no bgp ebgp-requires-policy
+ no bgp network import-check
+{% for neighbor in frr_bgp_neighbors %}
+ neighbor {{ neighbor.address }} remote-as {{ neighbor.remote_as }}
+{% if neighbor.description is defined %} neighbor {{ neighbor.address }} description {{ neighbor.description }}{% endif %}
+{% endfor %}
+{% for neighbor in frr_bgp_neighbors %}
+ address-family ipv4 unicast
+  neighbor {{ neighbor.address }} activate
+{% if neighbor.next_hop_self | default(false) %}  neighbor {{ neighbor.address }} next-hop-self{% endif %}
+ exit-address-family
+{% endfor %}
+!
+router ospf
+ ospf router-id {{ frr_router_id }}
+{% for network in frr_ospf_networks | default([]) %}
+ network {{ network.prefix }} area {{ network.area | default('0.0.0.0') }}
+{% endfor %}
+!
+{% for route in frr_static_routes | default([]) %}
+ip route {{ route.prefix }} {{ route.next_hop }}
+{% endfor %}
+!
+line vty

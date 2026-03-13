@@ -1,0 +1,4 @@
+base_packages_extra:
+  - frr
+  - frr-pythontools
+  - bridge-utils

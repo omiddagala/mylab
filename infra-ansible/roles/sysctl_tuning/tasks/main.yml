@@ -1,0 +1,21 @@
+---
+- name: Ensure br_netfilter is loaded on k8s nodes
+  community.general.modprobe:
+    name: br_netfilter
+    state: present
+  when: "'k8s_cluster' in group_names"
+
+- name: Ensure overlay module is loaded on k8s nodes
+  community.general.modprobe:
+    name: overlay
+    state: present
+  when: "'k8s_cluster' in group_names"
+
+- name: Configure sysctl settings
+  ansible.builtin.template:
+    src: 99-mylab.conf.j2
+    dest: /etc/sysctl.d/99-mylab.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload sysctl

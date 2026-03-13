@@ -1,26 +1,14 @@
-- name: Configure sshd hardening
-  copy:
-    dest: /etc/ssh/sshd_config.d/99-hardening.conf
-    mode: '0644'
-    content: |
-      Protocol 2
-      PermitRootLogin no
-      PasswordAuthentication no
-      KbdInteractiveAuthentication no
-      ChallengeResponseAuthentication no
-      PubkeyAuthentication yes
-      UsePAM yes
-      X11Forwarding no
-      AllowTcpForwarding yes
-      AllowAgentForwarding yes
-      PermitTunnel no
-      ClientAliveInterval 300
-      ClientAliveCountMax 2
-      AllowUsers ops
-      AuthenticationMethods publickey
+---
+- name: Install OpenSSH server
+  ansible.builtin.apt:
+    name: openssh-server
+    state: present
 
-- name: Restart ssh
-  service:
-    name: ssh
-    state: restarted
-    enabled: true
+- name: Configure sshd
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0600'
+  notify: Restart ssh

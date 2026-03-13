@@ -1,0 +1,9 @@
+bastion_extra_packages:
+  - tmux
+  - mosh
+  - tree
+  - nmap
+  - ripgrep
+  - fzf
+  - age
+  - sops

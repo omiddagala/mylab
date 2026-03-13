@@ -1,0 +1,6 @@
+mgmt_interface: ens18
+mgmt_ip_cidr: 10.20.0.21/24
+mgmt_gateway: 10.20.0.1
+k8s_node_labels:
+  topology.kubernetes.io/zone: dc2
+  node-role.kubernetes.io/control-plane: ""

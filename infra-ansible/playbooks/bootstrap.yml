@@ -1,8 +1,13 @@
-- name: Bootstrap all nodes
+---
+- name: OS bootstrap baseline
   hosts: all
   become: true
   roles:
-    - common
-    - resolver
-    - chrony
+    - common_base
+    - apt_baseline
+    - users_admin
     - ssh_hardening
+    - time_sync
+    - journald
+    - sysctl_tuning
+    - nftables_base

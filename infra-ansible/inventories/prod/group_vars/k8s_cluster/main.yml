@@ -1,0 +1,17 @@
+base_packages_extra:
+  - socat
+  - conntrack
+  - ebtables
+  - ethtool
+  - ipset
+  - criu
+  - open-iscsi
+  - nfs-common
+  - containerd
+  - runc
+
+sysctl_k8s:
+  net.bridge.bridge-nf-call-iptables: 1
+  net.bridge.bridge-nf-call-ip6tables: 1
+  net.ipv4.ip_nonlocal_bind: 1
+  net.ipv4.ip_local_reserved_ports: 30000-32767

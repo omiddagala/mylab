@@ -1,0 +1,19 @@
+Port {{ ssh_port }}
+Protocol 2
+PermitRootLogin {{ ssh_permit_root_login }}
+PasswordAuthentication {{ ssh_password_authentication }}
+KbdInteractiveAuthentication no
+ChallengeResponseAuthentication no
+UsePAM yes
+PubkeyAuthentication {{ ssh_pubkey_authentication }}
+X11Forwarding {{ ssh_x11_forwarding }}
+AllowUsers {{ ssh_allow_users | join(' ') }}
+ClientAliveInterval {{ ssh_client_alive_interval }}
+ClientAliveCountMax {{ ssh_client_alive_count_max }}
+LoginGraceTime 30
+MaxAuthTries 3
+PermitEmptyPasswords no
+PermitTunnel no
+AllowAgentForwarding no
+AllowTcpForwarding no
+Subsystem sftp /usr/lib/openssh/sftp-server

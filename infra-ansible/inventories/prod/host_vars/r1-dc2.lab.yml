@@ -1,0 +1,13 @@
+mgmt_interface: ens18
+mgmt_ip_cidr: 10.20.0.11/24
+mgmt_gateway: 10.20.0.1
+frr_router_id: 10.255.2.1
+frr_bgp_asn: 65002
+frr_bgp_neighbors:
+  - address: 10.255.2.2
+    remote_as: 65002
+    description: r2-dc2
+    next_hop_self: true
+frr_ospf_networks:
+  - prefix: 10.20.0.0/24
+    area: 0.0.0.0

@@ -1,0 +1,3 @@
+common_disable_recommends: true
+common_remove_packages:
+  - unattended-upgrades

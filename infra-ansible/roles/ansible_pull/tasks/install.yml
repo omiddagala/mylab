@@ -1,8 +1,0 @@
----
-- name: Install ansible and git
-  apt:
-    name:
-      - ansible
-      - git
-    state: present
-    update_cache: true

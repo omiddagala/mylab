@@ -1,6 +1,0 @@
----
-ansible_pull_repo: "https://github.com/your-org/infra-ansible.git"
-ansible_pull_branch: "main"
-ansible_pull_playbook: "site.yml"
-ansible_pull_workdir: "/opt/infra-ansible"
-ansible_pull_interval: "5min"

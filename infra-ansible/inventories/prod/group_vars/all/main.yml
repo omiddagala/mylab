@@ -1,0 +1,113 @@
+lab_domain: lab
+lab_timezone: Europe/Amsterdam
+
+admin_group: opsadmin
+admin_users:
+  - username: ansible
+    uid: 2000
+    groups: [sudo, adm]
+    ssh_keys:
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMYLABREPLACEWITHYOURREALKEY ansible@mylab"
+  - username: omid
+    uid: 2001
+    groups: [sudo, adm]
+    ssh_keys:
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIUSERREPLACEWITHYOURREALKEY omid@mylab"
+
+package_state: present
+base_packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - vim
+  - git
+  - jq
+  - rsync
+  - bash-completion
+  - unzip
+  - tcpdump
+  - lsof
+  - htop
+  - dnsutils
+  - net-tools
+  - iproute2
+  - arping
+  - traceroute
+  - mtr-tiny
+  - gnupg
+  - gpg
+  - software-properties-common
+  - python3
+  - python3-apt
+  - python3-pip
+  - sudo
+  - chrony
+  - nftables
+  - acl
+
+chrony_pool:
+  - 0.pool.ntp.org iburst
+  - 1.pool.ntp.org iburst
+  - 2.pool.ntp.org iburst
+  - 3.pool.ntp.org iburst
+
+sysctl_common:
+  net.ipv4.ip_forward: 1
+  net.ipv4.conf.all.rp_filter: 0
+  net.ipv4.conf.default.rp_filter: 0
+  net.ipv4.conf.all.accept_redirects: 0
+  net.ipv4.conf.default.accept_redirects: 0
+  net.ipv4.conf.all.send_redirects: 0
+  net.ipv4.conf.default.send_redirects: 0
+  net.ipv4.tcp_syncookies: 1
+  net.ipv4.icmp_echo_ignore_broadcasts: 1
+  net.ipv6.conf.all.accept_redirects: 0
+  net.ipv6.conf.default.accept_redirects: 0
+  kernel.kptr_restrict: 2
+  kernel.dmesg_restrict: 1
+  kernel.yama.ptrace_scope: 1
+  fs.inotify.max_user_instances: 8192
+  fs.inotify.max_user_watches: 1048576
+  vm.swappiness: 10
+
+journald_storage: persistent
+journald_system_max_use: 512M
+journald_max_retention_sec: 1month
+
+node_exporter_version: 1.8.2
+node_exporter_user: node-exp
+node_exporter_port: 9100
+
+ssh_port: 22
+ssh_permit_root_login: 'no'
+ssh_password_authentication: 'no'
+ssh_pubkey_authentication: 'yes'
+ssh_x11_forwarding: 'no'
+ssh_allow_users:
+  - ansible
+  - omid
+
+nft_base_allowed_tcp:
+  - 22
+  - 9100
+nft_base_allowed_udp: []
+
+containerd_version_channel: stable
+kubernetes_version: "1.31"
+kubernetes_apt_version: "1.31"
+k8s_allowed_tcp_control_plane:
+  - 6443
+  - 2379-2380
+  - 10250
+  - 10257
+  - 10259
+k8s_allowed_tcp_worker:
+  - 10250
+  - 30000-32767
+
+pod_network_cidr: 10.244.0.0/16
+service_network_cidr: 10.96.0.0/12
+
+frr_asn_map:
+  dc1: 65001
+  dc2: 65002

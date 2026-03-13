@@ -1,0 +1,16 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: "{{ apt_cache_valid_time }}"
+
+- name: Install baseline packages
+  ansible.builtin.apt:
+    name: "{{ base_packages + (base_packages_extra | default([])) }}"
+    state: "{{ package_state }}"
+    install_recommends: false
+
+- name: Upgrade all packages to latest safe state
+  ansible.builtin.apt:
+    upgrade: dist
+    update_cache: true

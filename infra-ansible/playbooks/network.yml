@@ -1,5 +1,12 @@
-- name: Configure interfaces and VLANs
-  hosts: routers:leaves:k8s_nodes
+---
+- name: Configure routers
+  hosts: routers
   become: true
   roles:
-    - base_network
+    - router_frr
+
+- name: Configure leafs
+  hosts: leafs
+  become: true
+  roles:
+    - leaf_l3

@@ -1,8 +1,0 @@
----
-- name: Create ansible-pull working directory
-  file:
-    path: "{{ ansible_pull_workdir }}"
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"

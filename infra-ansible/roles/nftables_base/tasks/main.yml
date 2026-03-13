@@ -1,0 +1,24 @@
+---
+- name: Build role-specific tcp allow list
+  ansible.builtin.set_fact:
+    nft_role_tcp: >-
+      {{
+        nft_base_allowed_tcp
+        + ((k8s_allowed_tcp_control_plane if 'k8s_control_plane' in group_names else []) | default([]))
+        + ((k8s_allowed_tcp_worker if 'k8s_workers' in group_names else []) | default([]))
+      }}
+
+- name: Configure nftables base policy
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart nftables
+
+- name: Enable nftables
+  ansible.builtin.service:
+    name: nftables
+    enabled: true
+    state: started

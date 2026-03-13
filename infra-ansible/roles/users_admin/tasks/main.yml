@@ -1,0 +1,32 @@
+---
+- name: Ensure admin group exists
+  ansible.builtin.group:
+    name: "{{ admin_group }}"
+    state: present
+
+- name: Ensure admin users exist
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    uid: "{{ item.uid | default(omit) }}"
+    shell: /bin/bash
+    create_home: "{{ admin_users_create_home }}"
+    groups: "{{ (item.groups | default([])) + [admin_group] }}"
+    append: true
+    state: present
+  loop: "{{ admin_users }}"
+
+- name: Install authorized keys
+  ansible.posix.authorized_key:
+    user: "{{ item.0.username }}"
+    key: "{{ item.1 }}"
+    state: present
+  loop: "{{ admin_users | subelements('ssh_keys') }}"
+
+- name: Configure passwordless sudo for admin group
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/90-opsadmin
+    content: "%{{ admin_group }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: '0440'
+    validate: /usr/sbin/visudo -cf %s

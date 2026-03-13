@@ -1,0 +1,18 @@
+---
+- name: Ensure leaf variables are defined
+  ansible.builtin.assert:
+    that:
+      - mgmt_interface is defined
+      - leaf_bridges is defined
+      - leaf_vlans is defined
+      - leaf_svis is defined
+    fail_msg: "Leaf host_vars must define mgmt_interface, leaf_bridges, leaf_vlans and leaf_svis."
+
+- name: Install leaf networking config
+  ansible.builtin.template:
+    src: interfaces.j2
+    dest: /etc/network/interfaces.d/mylab.cfg
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart networking

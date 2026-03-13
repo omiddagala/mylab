@@ -1,0 +1,3 @@
+{% for key, value in sysctl_merged | dictsort %}
+{{ key }} = {{ value }}
+{% endfor %}

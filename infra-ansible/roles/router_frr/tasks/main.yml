@@ -1,0 +1,38 @@
+---
+- name: Ensure required router variables are defined
+  ansible.builtin.assert:
+    that:
+      - frr_router_id is defined
+      - frr_bgp_asn is defined
+      - frr_bgp_neighbors is defined
+    fail_msg: "Router host_vars must define frr_router_id, frr_bgp_asn and frr_bgp_neighbors."
+
+- name: Enable FRR daemons
+  ansible.builtin.copy:
+    dest: /etc/frr/daemons
+    owner: frr
+    group: frr
+    mode: '0640'
+    content: |
+      bgpd=yes
+      ospfd=yes
+      staticd=yes
+      zebra=yes
+      mgmtd=yes
+      vtysh_enable=yes
+  notify: Restart frr
+
+- name: Configure FRR defaults
+  ansible.builtin.copy:
+    dest: /etc/frr/frr.conf
+    owner: frr
+    group: frr
+    mode: '0640'
+    content: "{{ lookup('template', 'frr.conf.j2') }}"
+  notify: Restart frr
+
+- name: Enable FRR
+  ansible.builtin.service:
+    name: "{{ frr_service_name }}"
+    enabled: true
+    state: started

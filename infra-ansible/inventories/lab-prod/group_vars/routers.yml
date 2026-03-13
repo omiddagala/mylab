@@ -1,3 +1,0 @@
-frr_bgp_asn: 65000
-frr_ospf_enabled: true
-router_role: edge

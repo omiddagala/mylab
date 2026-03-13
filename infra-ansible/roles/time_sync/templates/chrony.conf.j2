@@ -1,0 +1,7 @@
+{% for server in chrony_pool %}
+pool {{ server }}
+{% endfor %}
+driftfile /var/lib/chrony/chrony.drift
+rtcsync
+makestep {{ chrony_makestep }}
+logdir /var/log/chrony

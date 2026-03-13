@@ -1,33 +1,39 @@
-- name: Full convergence
+---
+- name: Full infra baseline
   hosts: all
   become: true
   roles:
-    - common
-    - resolver
-    - chrony
+    - common_base
+    - apt_baseline
+    - users_admin
     - ssh_hardening
-    - nftables
+    - time_sync
+    - journald
+    - sysctl_tuning
+    - nftables_base
+    - node_exporter
 
-- name: Configure base network
-  hosts: routers:leaves:k8s_nodes
+- name: Bastion baseline
+  hosts: bastion
   become: true
   roles:
-    - base_network
+    - bastion_base
 
-- name: Configure routing
-  hosts: routers:leaves
+- name: Router configuration
+  hosts: routers
   become: true
   roles:
-    - frr
+    - router_frr
 
-- name: Configure ansible-pull
-  hosts: all:!bastion1.dc1.lab
+- name: Leaf configuration
+  hosts: leafs
   become: true
   roles:
-    - ansible_pull
+    - leaf_l3
 
 - name: Kubernetes prerequisites
-  hosts: k8s_nodes
+  hosts: k8s_cluster
   become: true
   roles:
-    - common
+    - containerd
+    - kubernetes_common

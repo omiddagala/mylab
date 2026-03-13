@@ -1,0 +1,12 @@
+Create host_vars/<hostname>.yml files from your IPAM-generated data.
+This repository expects exact addressing and interface maps to come from the mylab IPAM repo.
+Below, the roles already work with host vars such as:
+- mgmt_interface
+- mgmt_ip_cidr
+- mgmt_gateway
+- leaf_vlans
+- leaf_svis
+- frr_router_id
+- frr_bgp_asn
+- frr_bgp_neighbors
+- k8s_node_labels
