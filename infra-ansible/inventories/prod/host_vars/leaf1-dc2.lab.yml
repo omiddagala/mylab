@@ -1,20 +1,26 @@
 ---
 node_role: leaf
 dc: dc2
-leaf_asn: 65120
-router_id: 10.255.2.11
-loopback_ip: 10.255.2.11/32
-mylab_primary_ip: 10.20.10.21
+
+leaf_asn: 65100
+router_id: 10.255.0.31
+loopback_ip: 10.255.0.31/32
+
+mylab_primary_ip: 10.20.50.11
 mylab_primary_interface: ens18
+
 frr_interfaces:
-  - { name: ens18, description: mgmt, address: 10.20.10.21/24 }
+  - { name: ens18, description: infra, address: 10.20.50.11/24 }
   - { name: ens19, description: to-r1-dc2, address: 172.16.255.38/30 }
   - { name: ens20, description: to-r2-dc2, address: 172.16.255.46/30 }
   - { name: ens21, description: server-uplink-a }
+
 leaf_bgp_neighbors:
   - { ip: 172.16.255.37, asn: 65002, desc: r1-dc2 }
   - { ip: 172.16.255.45, asn: 65002, desc: r2-dc2 }
+
 leaf_vlan_interfaces:
   - { vlan: 10, ifname: ens21.10, address: 10.20.10.1/24 }
-  - { vlan: 20, ifname: ens21.20, address: 10.20.20.1/24 }
-  - { vlan: 31, ifname: ens21.31, address: 10.20.31.1/24 }
+  - { vlan: 30, ifname: ens21.30, address: 10.20.20.1/24 }
+  - { vlan: 50, ifname: ens21.50, address: 10.20.40.1/24 }
+  - { vlan: 60, ifname: ens21.60, address: 10.20.60.1/24 }

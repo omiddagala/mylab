@@ -5,9 +5,7 @@ hypervisor_bridges:
   - name: br-mgmt-dc2
     address: 10.20.10.11/24
     gateway4: 10.20.10.1
-    dns_servers:
-      - 10.10.10.10
-      - 10.20.10.10
+    dns_servers: "{{ mylab_dns_servers }}"
     physical_nic: eno1
 
   - name: br-underlay-dc2
@@ -26,8 +24,8 @@ hypervisor_vms:
     nft_enabled: false
     nics:
       - bridge: br-underlay-dc2
-        mac: "52:54:00:20:00:01"
-        address: 10.20.0.1/24
+        mac: "52:54:00:20:50:01"
+        address: 10.20.50.1/24
 
   - name: r2-dc2.lab
     vcpus: 2
@@ -38,8 +36,8 @@ hypervisor_vms:
     nft_enabled: false
     nics:
       - bridge: br-underlay-dc2
-        mac: "52:54:00:20:00:02"
-        address: 10.20.0.2/24
+        mac: "52:54:00:20:50:02"
+        address: 10.20.50.2/24
 
   - name: leaf1-dc2.lab
     vcpus: 2
@@ -50,8 +48,8 @@ hypervisor_vms:
     nft_enabled: false
     nics:
       - bridge: br-underlay-dc2
-        mac: "52:54:00:20:00:11"
-        address: 10.20.0.11/24
+        mac: "52:54:00:20:50:11"
+        address: 10.20.50.11/24
 
   - name: leaf2-dc2.lab
     vcpus: 2
@@ -62,8 +60,8 @@ hypervisor_vms:
     nft_enabled: false
     nics:
       - bridge: br-underlay-dc2
-        mac: "52:54:00:20:00:12"
-        address: 10.20.0.12/24
+        mac: "52:54:00:20:50:12"
+        address: 10.20.50.12/24
 
   - name: prod2-cp1.dc2.lab
     vcpus: 4
@@ -73,27 +71,10 @@ hypervisor_vms:
     rp_filter_mode: 2
     nics:
       - bridge: br-prod2
-        mac: "52:54:00:20:11:11"
-        address: 10.20.110.11/24
-        gateway4: 10.20.110.1
-        nameservers:
-          - 10.10.10.10
-          - 10.20.10.10
-
-  - name: prod2-cp2.dc2.lab
-    vcpus: 4
-    memory_mb: 8192
-    disk_gb: 80
-    role: k8s-control-plane
-    rp_filter_mode: 2
-    nics:
-      - bridge: br-prod2
-        mac: "52:54:00:20:11:12"
-        address: 10.20.110.12/24
-        gateway4: 10.20.110.1
-        nameservers:
-          - 10.10.10.10
-          - 10.20.10.10
+        mac: "52:54:00:20:20:11"
+        address: 10.20.20.11/24
+        gateway4: 10.20.20.1
+        nameservers: "{{ mylab_dns_servers }}"
 
   - name: prod2-w1.dc2.lab
     vcpus: 4
@@ -103,12 +84,10 @@ hypervisor_vms:
     rp_filter_mode: 2
     nics:
       - bridge: br-prod2
-        mac: "52:54:00:20:11:21"
-        address: 10.20.110.21/24
-        gateway4: 10.20.110.1
-        nameservers:
-          - 10.10.10.10
-          - 10.20.10.10
+        mac: "52:54:00:20:20:21"
+        address: 10.20.20.21/24
+        gateway4: 10.20.20.1
+        nameservers: "{{ mylab_dns_servers }}"
 
   - name: prod2-w2.dc2.lab
     vcpus: 4
@@ -118,24 +97,7 @@ hypervisor_vms:
     rp_filter_mode: 2
     nics:
       - bridge: br-prod2
-        mac: "52:54:00:20:11:22"
-        address: 10.20.110.22/24
-        gateway4: 10.20.110.1
-        nameservers:
-          - 10.10.10.10
-          - 10.20.10.10
-
-  - name: prod2-w3.dc2.lab
-    vcpus: 4
-    memory_mb: 8192
-    disk_gb: 80
-    role: k8s-worker
-    rp_filter_mode: 2
-    nics:
-      - bridge: br-prod2
-        mac: "52:54:00:20:11:23"
-        address: 10.20.110.23/24
-        gateway4: 10.20.110.1
-        nameservers:
-          - 10.10.10.10
-          - 10.20.10.10
+        mac: "52:54:00:20:20:22"
+        address: 10.20.20.22/24
+        gateway4: 10.20.20.1
+        nameservers: "{{ mylab_dns_servers }}"

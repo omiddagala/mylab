@@ -1,8 +1,10 @@
 ---
 node_role: bastion
 dc: dc1
+
 mylab_primary_ip: 10.10.10.10
 mylab_primary_interface: ens18
+
 network_interfaces:
   - name: ens18
     address: 10.10.10.10/24

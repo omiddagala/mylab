@@ -10,6 +10,7 @@ mylab_admin_users:
     groups: ['sudo', '{{ mylab_admin_group }}']
     ssh_authorized_keys:
       - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIREPLACE_THIS_WITH_REAL_AUTOMATION_KEY automation@mylab"
+
   - name: omid
     shell: /bin/bash
     groups: ['sudo', '{{ mylab_admin_group }}']
@@ -103,18 +104,17 @@ mylab_kubernetes_sysctl:
   net.ipv4.ip_forward: 1
 
 mylab_allowed_ssh_sources:
-  - 10.10.0.10/32
+  - 10.10.10.10/32
 
-mylab_management_subnet: 10.10.0.0/16
+mylab_management_subnet: 10.10.10.0/24
 
 mylab_vlan_definitions:
-  - { id: 10, name: mgmt }
-  - { id: 20, name: infra }
-  - { id: 30, name: k8s-dc1 }
-  - { id: 31, name: k8s-dc2 }
-  - { id: 40, name: storage }
-  - { id: 50, name: public-services }
-  - { id: 99, name: transit }
+  - { id: 10, name: management }
+  - { id: 20, name: prod1 }
+  - { id: 30, name: prod2 }
+  - { id: 50, name: storage }
+  - { id: 60, name: dmz }
+  - { id: 70, name: infra }
 
 mylab_cluster_map:
   prod1:
@@ -126,6 +126,7 @@ mylab_cluster_map:
       - prod1-w2.dc1.lab
     pod_cidr: 10.244.0.0/16
     service_cidr: 10.96.0.0/16
+
   prod2:
     dc: dc2
     control_plane:

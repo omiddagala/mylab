@@ -17,7 +17,6 @@ mylab_sysctl_overrides:
   net.ipv4.ip_forward: 1
 
 mylab_rp_filter_mode: 0
-
 mylab_nft_extra_tcp_in:
   - 16509
 

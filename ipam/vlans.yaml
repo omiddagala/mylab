@@ -1,5 +1,5 @@
+---
 vlans:
-
   management:
     id: 10
     description: management network
@@ -11,10 +11,6 @@ vlans:
   prod2:
     id: 30
     description: prod2 kubernetes nodes
-
-  dev:
-    id: 40
-    description: dev kubernetes nodes
 
   storage:
     id: 50

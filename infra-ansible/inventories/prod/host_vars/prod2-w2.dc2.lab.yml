@@ -2,10 +2,12 @@
 node_role: kube_worker
 cluster_name: prod2
 dc: dc2
-mylab_primary_ip: 10.20.31.22
+
+mylab_primary_ip: 10.20.20.22
 mylab_primary_interface: ens18
+
 network_interfaces:
   - name: ens18
-    address: 10.20.31.22/24
-    gateway: 10.20.31.1
+    address: 10.20.20.22/24
+    gateway: 10.20.20.1
     dns: "{{ mylab_dns_servers }}"

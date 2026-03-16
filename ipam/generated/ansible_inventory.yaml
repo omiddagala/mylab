@@ -1,225 +1,171 @@
+---
 all:
   children:
     linux:
       hosts:
-        dev-cp1.dc1.lab:
-          ansible_host: 10.10.30.11
-          role: k8s-master
-          cluster: dev
-        dev-cp2.dc1.lab:
-          ansible_host: 10.10.30.12
-          role: k8s-master
-          cluster: dev
-        prod1-cp1.dc1.lab:
-          ansible_host: 10.10.20.11
-          role: k8s-master
-          cluster: prod1
-        prod1-cp2.dc1.lab:
-          ansible_host: 10.10.20.12
-          role: k8s-master
-          cluster: prod1
-        prod2-cp1.dc2.lab:
-          ansible_host: 10.20.20.11
-          role: k8s-master
-          cluster: prod2
-        prod2-cp2.dc2.lab:
-          ansible_host: 10.20.20.12
-          role: k8s-master
-          cluster: prod2
-        dev-w1.dc1.lab:
-          ansible_host: 10.10.30.21
-          role: k8s-worker
-          cluster: dev
-        dev-w2.dc1.lab:
-          ansible_host: 10.10.30.22
-          role: k8s-worker
-          cluster: dev
-        dev-w3.dc1.lab:
-          ansible_host: 10.10.30.23
-          role: k8s-worker
-          cluster: dev
-        prod1-w1.dc1.lab:
-          ansible_host: 10.10.20.21
-          role: k8s-worker
-          cluster: prod1
-        prod1-w2.dc1.lab:
-          ansible_host: 10.10.20.22
-          role: k8s-worker
-          cluster: prod1
-        prod1-w3.dc1.lab:
-          ansible_host: 10.10.20.23
-          role: k8s-worker
-          cluster: prod1
-        prod2-w1.dc2.lab:
-          ansible_host: 10.20.20.21
-          role: k8s-worker
-          cluster: prod2
-        prod2-w2.dc2.lab:
-          ansible_host: 10.20.20.22
-          role: k8s-worker
-          cluster: prod2
-        prod2-w3.dc2.lab:
-          ansible_host: 10.20.20.23
-          role: k8s-worker
-          cluster: prod2
         bastion1.dc1.lab:
           ansible_host: 10.10.10.10
           role: bastion
           dc: dc1
           vlan: management
-        leaf1-dc1.lab:
-          ansible_host: 10.10.50.11
-          role: leaf
-          dc: dc1
-          loopback: 10.255.0.11
-        leaf2-dc1.lab:
-          ansible_host: 10.10.50.12
-          role: leaf
-          dc: dc1
-          loopback: 10.255.0.12
+
         r1-dc1.lab:
           ansible_host: 10.10.50.1
           role: router
           dc: dc1
+          vlan: infra
           loopback: 10.255.0.1
+
         r2-dc1.lab:
           ansible_host: 10.10.50.2
           role: router
           dc: dc1
+          vlan: infra
           loopback: 10.255.0.2
-        leaf1-dc2.lab:
-          ansible_host: 10.20.50.11
+
+        leaf1-dc1.lab:
+          ansible_host: 10.10.50.11
           role: leaf
-          dc: dc2
-          loopback: 10.255.0.31
-        leaf2-dc2.lab:
-          ansible_host: 10.20.50.12
+          dc: dc1
+          vlan: infra
+          loopback: 10.255.0.11
+
+        leaf2-dc1.lab:
+          ansible_host: 10.10.50.12
           role: leaf
-          dc: dc2
-          loopback: 10.255.0.32
+          dc: dc1
+          vlan: infra
+          loopback: 10.255.0.12
+
         r1-dc2.lab:
           ansible_host: 10.20.50.1
           role: router
           dc: dc2
+          vlan: infra
           loopback: 10.255.0.21
+
         r2-dc2.lab:
           ansible_host: 10.20.50.2
           role: router
           dc: dc2
+          vlan: infra
           loopback: 10.255.0.22
+
+        leaf1-dc2.lab:
+          ansible_host: 10.20.50.11
+          role: leaf
+          dc: dc2
+          vlan: infra
+          loopback: 10.255.0.31
+
+        leaf2-dc2.lab:
+          ansible_host: 10.20.50.12
+          role: leaf
+          dc: dc2
+          vlan: infra
+          loopback: 10.255.0.32
+
+        prod1-cp1.dc1.lab:
+          ansible_host: 10.10.20.11
+          role: k8s-control-plane
+          cluster: prod1
+          dc: dc1
+          vlan: prod1
+
+        prod1-w1.dc1.lab:
+          ansible_host: 10.10.20.21
+          role: k8s-worker
+          cluster: prod1
+          dc: dc1
+          vlan: prod1
+
+        prod1-w2.dc1.lab:
+          ansible_host: 10.10.20.22
+          role: k8s-worker
+          cluster: prod1
+          dc: dc1
+          vlan: prod1
+
+        prod2-cp1.dc2.lab:
+          ansible_host: 10.20.20.11
+          role: k8s-control-plane
+          cluster: prod2
+          dc: dc2
+          vlan: prod2
+
+        prod2-w1.dc2.lab:
+          ansible_host: 10.20.20.21
+          role: k8s-worker
+          cluster: prod2
+          dc: dc2
+          vlan: prod2
+
+        prod2-w2.dc2.lab:
+          ansible_host: 10.20.20.22
+          role: k8s-worker
+          cluster: prod2
+          dc: dc2
+          vlan: prod2
+
     bastion:
       hosts:
         bastion1.dc1.lab:
-          ansible_host: 10.10.10.10
+
     routers:
       hosts:
         r1-dc1.lab:
-          ansible_host: 10.10.50.1
         r2-dc1.lab:
-          ansible_host: 10.10.50.2
         r1-dc2.lab:
-          ansible_host: 10.20.50.1
         r2-dc2.lab:
-          ansible_host: 10.20.50.2
+
     leafs:
       hosts:
         leaf1-dc1.lab:
-          ansible_host: 10.10.50.11
         leaf2-dc1.lab:
-          ansible_host: 10.10.50.12
         leaf1-dc2.lab:
-          ansible_host: 10.20.50.11
         leaf2-dc2.lab:
-          ansible_host: 10.20.50.12
+
     k8s_prod1:
       hosts:
         prod1-cp1.dc1.lab:
-          ansible_host: 10.10.20.11
-        prod1-cp2.dc1.lab:
-          ansible_host: 10.10.20.12
         prod1-w1.dc1.lab:
-          ansible_host: 10.10.20.21
         prod1-w2.dc1.lab:
-          ansible_host: 10.10.20.22
-        prod1-w3.dc1.lab:
-          ansible_host: 10.10.20.23
-    k8s_dev:
-      hosts:
-        dev-cp1.dc1.lab:
-          ansible_host: 10.10.30.11
-        dev-cp2.dc1.lab:
-          ansible_host: 10.10.30.12
-        dev-w1.dc1.lab:
-          ansible_host: 10.10.30.21
-        dev-w2.dc1.lab:
-          ansible_host: 10.10.30.22
-        dev-w3.dc1.lab:
-          ansible_host: 10.10.30.23
+
     k8s_prod2:
       hosts:
         prod2-cp1.dc2.lab:
-          ansible_host: 10.20.20.11
-        prod2-cp2.dc2.lab:
-          ansible_host: 10.20.20.12
         prod2-w1.dc2.lab:
-          ansible_host: 10.20.20.21
         prod2-w2.dc2.lab:
-          ansible_host: 10.20.20.22
-        prod2-w3.dc2.lab:
-          ansible_host: 10.20.20.23
+
     k8s_control_plane:
       hosts:
-        dev-cp1.dc1.lab:
-          ansible_host: 10.10.30.11
-        dev-cp2.dc1.lab:
-          ansible_host: 10.10.30.12
         prod1-cp1.dc1.lab:
-          ansible_host: 10.10.20.11
-        prod1-cp2.dc1.lab:
-          ansible_host: 10.10.20.12
         prod2-cp1.dc2.lab:
-          ansible_host: 10.20.20.11
-        prod2-cp2.dc2.lab:
-          ansible_host: 10.20.20.12
+
     k8s_workers:
       hosts:
-        dev-w1.dc1.lab:
-          ansible_host: 10.10.30.21
-        dev-w2.dc1.lab:
-          ansible_host: 10.10.30.22
-        dev-w3.dc1.lab:
-          ansible_host: 10.10.30.23
         prod1-w1.dc1.lab:
-          ansible_host: 10.10.20.21
         prod1-w2.dc1.lab:
-          ansible_host: 10.10.20.22
-        prod1-w3.dc1.lab:
-          ansible_host: 10.10.20.23
         prod2-w1.dc2.lab:
-          ansible_host: 10.20.20.21
         prod2-w2.dc2.lab:
-          ansible_host: 10.20.20.22
-        prod2-w3.dc2.lab:
-          ansible_host: 10.20.20.23
+
     dc1:
       hosts:
         bastion1.dc1.lab:
-          ansible_host: 10.10.10.10
-        leaf1-dc1.lab:
-          ansible_host: 10.10.50.11
-        leaf2-dc1.lab:
-          ansible_host: 10.10.50.12
         r1-dc1.lab:
-          ansible_host: 10.10.50.1
         r2-dc1.lab:
-          ansible_host: 10.10.50.2
+        leaf1-dc1.lab:
+        leaf2-dc1.lab:
+        prod1-cp1.dc1.lab:
+        prod1-w1.dc1.lab:
+        prod1-w2.dc1.lab:
+
     dc2:
       hosts:
-        leaf1-dc2.lab:
-          ansible_host: 10.20.50.11
-        leaf2-dc2.lab:
-          ansible_host: 10.20.50.12
         r1-dc2.lab:
-          ansible_host: 10.20.50.1
         r2-dc2.lab:
-          ansible_host: 10.20.50.2
+        leaf1-dc2.lab:
+        leaf2-dc2.lab:
+        prod2-cp1.dc2.lab:
+        prod2-w1.dc2.lab:
+        prod2-w2.dc2.lab:

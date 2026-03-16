@@ -1,20 +1,25 @@
 ---
 node_role: router
 dc: dc2
+
 router_asn: 65002
-router_id: 10.255.2.1
-loopback_ip: 10.255.2.1/32
-mylab_primary_ip: 10.20.10.11
+router_id: 10.255.0.21
+loopback_ip: 10.255.0.21/32
+
+mylab_primary_ip: 10.20.50.1
 mylab_primary_interface: ens18
+
 frr_interfaces:
-  - { name: ens18, description: mgmt, address: 10.20.10.11/24 }
+  - { name: ens18, description: infra, address: 10.20.50.1/24 }
   - { name: ens19, description: transit-to-r2-dc2, address: 172.16.255.33/30 }
   - { name: ens20, description: uplink-to-leaf1-dc2, address: 172.16.255.37/30 }
   - { name: ens21, description: uplink-to-leaf2-dc2, address: 172.16.255.41/30 }
+
 router_bgp_neighbors:
-  - { ip: 172.16.255.38, asn: 65120, desc: leaf1-dc2 }
-  - { ip: 172.16.255.42, asn: 65120, desc: leaf2-dc2 }
+  - { ip: 172.16.255.38, asn: 65100, desc: leaf1-dc2 }
+  - { ip: 172.16.255.42, asn: 65100, desc: leaf2-dc2 }
   - { ip: 172.16.255.34, asn: 65002, desc: r2-dc2 }
+
 router_ospf_networks:
   - 172.16.255.32/30
   - 172.16.255.36/30

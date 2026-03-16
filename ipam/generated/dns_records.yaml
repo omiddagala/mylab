@@ -1,74 +1,59 @@
+---
 a_records:
-  dev-cp1.dc1.lab: 10.10.30.11
-  dev-cp1: 10.10.30.11
-  dev-cp2.dc1.lab: 10.10.30.12
-  dev-cp2: 10.10.30.12
-  prod1-cp1.dc1.lab: 10.10.20.11
-  prod1-cp1: 10.10.20.11
-  prod1-cp2.dc1.lab: 10.10.20.12
-  prod1-cp2: 10.10.20.12
-  prod2-cp1.dc2.lab: 10.20.20.11
-  prod2-cp1: 10.20.20.11
-  prod2-cp2.dc2.lab: 10.20.20.12
-  prod2-cp2: 10.20.20.12
-  dev-w1.dc1.lab: 10.10.30.21
-  dev-w1: 10.10.30.21
-  dev-w2.dc1.lab: 10.10.30.22
-  dev-w2: 10.10.30.22
-  dev-w3.dc1.lab: 10.10.30.23
-  dev-w3: 10.10.30.23
-  prod1-w1.dc1.lab: 10.10.20.21
-  prod1-w1: 10.10.20.21
-  prod1-w2.dc1.lab: 10.10.20.22
-  prod1-w2: 10.10.20.22
-  prod1-w3.dc1.lab: 10.10.20.23
-  prod1-w3: 10.10.20.23
-  prod2-w1.dc2.lab: 10.20.20.21
-  prod2-w1: 10.20.20.21
-  prod2-w2.dc2.lab: 10.20.20.22
-  prod2-w2: 10.20.20.22
-  prod2-w3.dc2.lab: 10.20.20.23
-  prod2-w3: 10.20.20.23
   bastion1.dc1.lab: 10.10.10.10
   bastion1: 10.10.10.10
-  leaf1-dc1.lab: 10.10.50.11
-  leaf1-dc1: 10.10.50.11
-  leaf2-dc1.lab: 10.10.50.12
-  leaf2-dc1: 10.10.50.12
+
   r1-dc1.lab: 10.10.50.1
   r1-dc1: 10.10.50.1
   r2-dc1.lab: 10.10.50.2
   r2-dc1: 10.10.50.2
-  leaf1-dc2.lab: 10.20.50.11
-  leaf1-dc2: 10.20.50.11
-  leaf2-dc2.lab: 10.20.50.12
-  leaf2-dc2: 10.20.50.12
+
+  leaf1-dc1.lab: 10.10.50.11
+  leaf1-dc1: 10.10.50.11
+  leaf2-dc1.lab: 10.10.50.12
+  leaf2-dc1: 10.10.50.12
+
   r1-dc2.lab: 10.20.50.1
   r1-dc2: 10.20.50.1
   r2-dc2.lab: 10.20.50.2
   r2-dc2: 10.20.50.2
+
+  leaf1-dc2.lab: 10.20.50.11
+  leaf1-dc2: 10.20.50.11
+  leaf2-dc2.lab: 10.20.50.12
+  leaf2-dc2: 10.20.50.12
+
+  prod1-cp1.dc1.lab: 10.10.20.11
+  prod1-cp1: 10.10.20.11
+  prod1-w1.dc1.lab: 10.10.20.21
+  prod1-w1: 10.10.20.21
+  prod1-w2.dc1.lab: 10.10.20.22
+  prod1-w2: 10.10.20.22
+
+  prod2-cp1.dc2.lab: 10.20.20.11
+  prod2-cp1: 10.20.20.11
+  prod2-w1.dc2.lab: 10.20.20.21
+  prod2-w1: 10.20.20.21
+  prod2-w2.dc2.lab: 10.20.20.22
+  prod2-w2: 10.20.20.22
+
 ptr_records:
-  11.30.10.10.in-addr.arpa: dev-cp1.dc1.lab
-  12.30.10.10.in-addr.arpa: dev-cp2.dc1.lab
-  11.20.10.10.in-addr.arpa: prod1-cp1.dc1.lab
-  12.20.10.10.in-addr.arpa: prod1-cp2.dc1.lab
-  11.20.20.10.in-addr.arpa: prod2-cp1.dc2.lab
-  12.20.20.10.in-addr.arpa: prod2-cp2.dc2.lab
-  21.30.10.10.in-addr.arpa: dev-w1.dc1.lab
-  22.30.10.10.in-addr.arpa: dev-w2.dc1.lab
-  23.30.10.10.in-addr.arpa: dev-w3.dc1.lab
-  21.20.10.10.in-addr.arpa: prod1-w1.dc1.lab
-  22.20.10.10.in-addr.arpa: prod1-w2.dc1.lab
-  23.20.10.10.in-addr.arpa: prod1-w3.dc1.lab
-  21.20.20.10.in-addr.arpa: prod2-w1.dc2.lab
-  22.20.20.10.in-addr.arpa: prod2-w2.dc2.lab
-  23.20.20.10.in-addr.arpa: prod2-w3.dc2.lab
   10.10.10.10.in-addr.arpa: bastion1.dc1.lab
-  11.50.10.10.in-addr.arpa: leaf1-dc1.lab
-  12.50.10.10.in-addr.arpa: leaf2-dc1.lab
+
   1.50.10.10.in-addr.arpa: r1-dc1.lab
   2.50.10.10.in-addr.arpa: r2-dc1.lab
-  11.50.20.10.in-addr.arpa: leaf1-dc2.lab
-  12.50.20.10.in-addr.arpa: leaf2-dc2.lab
+  11.50.10.10.in-addr.arpa: leaf1-dc1.lab
+  12.50.10.10.in-addr.arpa: leaf2-dc1.lab
+
   1.50.20.10.in-addr.arpa: r1-dc2.lab
   2.50.20.10.in-addr.arpa: r2-dc2.lab
+  11.50.20.10.in-addr.arpa: leaf1-dc2.lab
+  12.50.20.10.in-addr.arpa: leaf2-dc2.lab
+
+  11.20.10.10.in-addr.arpa: prod1-cp1.dc1.lab
+  21.20.10.10.in-addr.arpa: prod1-w1.dc1.lab
+  22.20.10.10.in-addr.arpa: prod1-w2.dc1.lab
+
+  11.20.20.10.in-addr.arpa: prod2-cp1.dc2.lab
+  21.20.20.10.in-addr.arpa: prod2-w1.dc2.lab
+  22.20.20.10.in-addr.arpa: prod2-w2.dc2.lab
