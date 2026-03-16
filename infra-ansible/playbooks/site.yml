@@ -1,6 +1,7 @@
 ---
-- name: Full infra baseline
-  hosts: all
+- name: Bootstrap all Linux nodes
+  hosts: linux
+  gather_facts: true
   become: true
   roles:
     - common_base
@@ -13,26 +14,30 @@
     - nftables_base
     - node_exporter
 
-- name: Bastion baseline
+- name: Configure bastion
   hosts: bastion
+  gather_facts: true
   become: true
   roles:
     - bastion_base
 
-- name: Router configuration
+- name: Configure routers
   hosts: routers
+  gather_facts: true
   become: true
   roles:
     - router_frr
 
-- name: Leaf configuration
+- name: Configure leafs
   hosts: leafs
+  gather_facts: true
   become: true
   roles:
     - leaf_l3
 
-- name: Kubernetes prerequisites
-  hosts: k8s_cluster
+- name: Prepare kubernetes nodes
+  hosts: kubernetes
+  gather_facts: true
   become: true
   roles:
     - containerd

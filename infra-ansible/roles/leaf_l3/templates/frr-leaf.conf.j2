@@ -1,0 +1,35 @@
+frr version 8.4
+frr defaults traditional
+hostname {{ inventory_hostname_short }}
+service integrated-vtysh-config
+log syslog informational
+
+interface lo
+ ip address {{ loopback_ip }}
+
+{% for iface in frr_interfaces if iface.address is defined %}
+interface {{ iface.name }}
+ description {{ iface.description | default(iface.name) }}
+ ip address {{ iface.address }}
+{% endfor %}
+
+{% for svi in leaf_vlan_interfaces %}
+interface {{ svi.ifname }}
+ ip address {{ svi.address }}
+{% endfor %}
+
+router ospf
+ ospf router-id {{ router_id }}
+
+router bgp {{ leaf_asn }}
+ bgp router-id {{ router_id }}
+ no bgp ebgp-requires-policy
+{% for n in leaf_bgp_neighbors %}
+ neighbor {{ n.ip }} remote-as {{ n.asn }}
+ neighbor {{ n.ip }} description {{ n.desc }}
+{% endfor %}
+ address-family ipv4 unicast
+{% for n in leaf_bgp_neighbors %}
+  neighbor {{ n.ip }} activate
+{% endfor %}
+ exit-address-family

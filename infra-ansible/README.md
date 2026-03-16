@@ -1,85 +1,58 @@
 # mylab infra-ansible
 
-Production-ready Ansible repository for the **mylab** dual-datacenter lab.
+Integrated **infra-ansible** repository for the current **mylab** topology.
 
-This repository configures the operating system and infrastructure baseline for:
-- bastion host
-- routers
-- leaf/L3 switch nodes
-- Kubernetes nodes for **prod only**
-  - `prod1` in `dc1`: `1 control-plane + 2 workers`
-  - `prod2` in `dc2`: `1 control-plane + 2 workers`
+Aligned to the current mylab contract:
 
-It intentionally does **not** create a dev environment.
+- **prod-only**
+- **two datacenters**
+- **one control-plane and two worker nodes in each cluster**
+- **same current FQDN set across infra/IPAM/hypervisor/kubespray**
+- **bastion-only administration**
+- **Debian baseline + network + FRR + Kubernetes node prep**
 
-## Scope
+## Current topology
 
-This repo handles:
-- OS baseline
-- package baseline
-- admin users and SSH hardening
-- journald, sysctl, nftables baseline
-- time sync
-- node exporter
-- containerd and Kubernetes prerequisites on cluster nodes
-- FRR configuration on router nodes
-- VLAN / bridge / SVI style L3 leaf configuration on leaf nodes
-- bastion host baseline
+### DC1
+- bastion1.dc1.lab
+- r1-dc1.lab
+- r2-dc1.lab
+- leaf1-dc1.lab
+- leaf2-dc1.lab
+- prod1-cp1.dc1.lab
+- prod1-w1.dc1.lab
+- prod1-w2.dc1.lab
 
-This repo does **not** replace:
-- hypervisor VM provisioning
-- IPAM source-of-truth generation
-- Kubespray cluster deployment
-- GitOps platform deployment
+### DC2
+- r1-dc2.lab
+- r2-dc2.lab
+- leaf1-dc2.lab
+- leaf2-dc2.lab
+- prod2-cp1.dc2.lab
+- prod2-w1.dc2.lab
+- prod2-w2.dc2.lab
 
-Those belong to other mylab repos.
-
-## Repository layout
-
-```text
-inventories/prod/
-playbooks/
-roles/
-```
-
-## Inventory model
-
-The inventory uses these major groups:
-- `bastion`
-- `routers`
-- `leafs`
-- `k8s_control_plane`
-- `k8s_workers`
-- `k8s_cluster`
-- `dc1`
-- `dc2`
-
-## Run order
-
-Recommended order:
+## Run
 
 ```bash
+ansible-galaxy collection install -r requirements.yml
+ansible-inventory -i inventories/prod/hosts.yml --graph
 ansible-playbook -i inventories/prod/hosts.yml playbooks/site.yml
 ```
 
-Or stage-by-stage:
+## Staged runs
 
 ```bash
 ansible-playbook -i inventories/prod/hosts.yml playbooks/bootstrap.yml
 ansible-playbook -i inventories/prod/hosts.yml playbooks/network.yml
-ansible-playbook -i inventories/prod/hosts.yml playbooks/kubernetes-prereqs.yml
+ansible-playbook -i inventories/prod/hosts.yml playbooks/kubernetes.yml
 ansible-playbook -i inventories/prod/hosts.yml playbooks/observability.yml
+ansible-playbook -i inventories/prod/hosts.yml playbooks/validate.yml
 ```
 
-## Requirements
+## Important notes
 
-- Ansible Core >= 2.16
-- Debian 12 on managed nodes
-- root or sudo access from bastion/control host
-- internet access or internal mirror for packages
-
-## Notes
-
-- Firewall defaults are conservative and intended for a lab with controlled east-west access.
-- Kubernetes ports are opened only on Kubernetes groups.
-- FRR templates are intentionally structured so you can later extend toward inter-DC routing or WireGuard underlay.
+- `inventories/prod/generated/` contains bridge artifacts aligned with the current mylab state.
+- SSH keys in `inventories/prod/group_vars/all/main.yml` are placeholders and must be replaced.
+- Interface names are written as `ens18`, `ens19`, ... based on a typical VM layout. Adjust if your hypervisor uses different names.
+- This repo **prepares** Kubernetes nodes; deploy the cluster in the next mylab stage.

@@ -1,0 +1,30 @@
+---
+all:
+  hosts:
+    prod1-cp1.dc1.lab: { ip: 10.10.30.11, access_ip: 10.10.30.11 }
+    prod1-w1.dc1.lab: { ip: 10.10.30.21, access_ip: 10.10.30.21 }
+    prod1-w2.dc1.lab: { ip: 10.10.30.22, access_ip: 10.10.30.22 }
+    prod2-cp1.dc2.lab: { ip: 10.20.31.11, access_ip: 10.20.31.11 }
+    prod2-w1.dc2.lab: { ip: 10.20.31.21, access_ip: 10.20.31.21 }
+    prod2-w2.dc2.lab: { ip: 10.20.31.22, access_ip: 10.20.31.22 }
+  children:
+    kube_control_plane:
+      hosts:
+        prod1-cp1.dc1.lab:
+        prod2-cp1.dc2.lab:
+    kube_node:
+      hosts:
+        prod1-cp1.dc1.lab:
+        prod1-w1.dc1.lab:
+        prod1-w2.dc1.lab:
+        prod2-cp1.dc2.lab:
+        prod2-w1.dc2.lab:
+        prod2-w2.dc2.lab:
+    etcd:
+      hosts:
+        prod1-cp1.dc1.lab:
+        prod2-cp1.dc2.lab:
+    k8s_cluster:
+      children:
+        kube_control_plane:
+        kube_node:

@@ -1,29 +1,35 @@
 ---
-- name: Ensure machine-id exists
-  ansible.builtin.command: systemd-machine-id-setup
-  args:
-    creates: /etc/machine-id
+- name: Ensure common kernel modules config is present
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/mylab-common.conf
+    mode: '0644'
+    content: |
+      {% for module in mylab_kernel_modules_common %}
+      {{ module }}
+      {% endfor %}
+  notify: Load common kernel modules
 
-- name: Remove conflicting packages
-  ansible.builtin.apt:
-    name: "{{ common_remove_packages }}"
-    state: absent
-    purge: true
-    autoremove: true
-  when: common_remove_packages | length > 0
+- name: Ensure hostname is set
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname_short }}"
+
+- name: Ensure /etc/hosts contains self reference
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '.*{{ inventory_hostname }}.*'
+    line: "{{ mylab_primary_ip }} {{ inventory_hostname }} {{ inventory_hostname_short }}"
+    state: present
+
+- name: Ensure timezone is configured
+  community.general.timezone:
+    name: "{{ mylab_timezone }}"
 
 - name: Ensure base directories exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: root
-    group: root
     mode: '0755'
   loop:
-    - /etc/ansible/facts.d
-    - /etc/systemd/system
-    - /usr/local/lib/systemd/system
-
-- name: Set hostname
-  ansible.builtin.hostname:
-    name: "{{ inventory_hostname }}"
+    - /etc/mylab
+    - /etc/systemd/journald.conf.d
+    - /etc/sysctl.d

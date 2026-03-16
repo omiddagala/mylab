@@ -1,2 +1,11 @@
 ---
-# no handlers required
+- name: Load kubernetes kernel modules
+  ansible.builtin.shell: |
+    set -euo pipefail
+    modprobe overlay
+    modprobe br_netfilter
+  args:
+    executable: /bin/bash
+
+- name: Reload sysctl
+  ansible.builtin.command: sysctl --system

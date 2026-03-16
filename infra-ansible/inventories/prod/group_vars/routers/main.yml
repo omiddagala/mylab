@@ -1,4 +1,8 @@
-base_packages_extra:
-  - frr
-  - frr-pythontools
-  - bridge-utils
+---
+router_frr_service_name: frr
+router_frr_manage_daemons:
+  bgpd: "yes"
+  ospfd: "yes"
+  zebra: "yes"
+  staticd: "yes"
+router_ospf_area: "0.0.0.0"

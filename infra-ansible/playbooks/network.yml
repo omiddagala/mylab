@@ -1,12 +1,28 @@
 ---
-- name: Configure routers
+- name: Firewall baseline
+  hosts: linux
+  gather_facts: true
+  become: true
+  roles:
+    - nftables_base
+
+- name: Bastion baseline
+  hosts: bastion
+  gather_facts: true
+  become: true
+  roles:
+    - bastion_base
+
+- name: Routers
   hosts: routers
+  gather_facts: true
   become: true
   roles:
     - router_frr
 
-- name: Configure leafs
+- name: Leafs
   hosts: leafs
+  gather_facts: true
   become: true
   roles:
     - leaf_l3

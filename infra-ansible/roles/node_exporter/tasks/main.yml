@@ -1,47 +1,56 @@
 ---
-- name: Create node exporter user
+- name: Ensure node_exporter user exists
   ansible.builtin.user:
-    name: "{{ node_exporter_user }}"
+    name: "{{ mylab_node_exporter_user }}"
     shell: /usr/sbin/nologin
-    create_home: false
     system: true
-    state: present
+    create_home: false
 
 - name: Download node exporter archive
   ansible.builtin.get_url:
-    url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/{{ node_exporter_archive }}.tar.gz"
-    dest: "/tmp/{{ node_exporter_archive }}.tar.gz"
+    url: "https://github.com/prometheus/node_exporter/releases/download/v{{ mylab_node_exporter_version }}/node_exporter-{{ mylab_node_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/node_exporter-{{ mylab_node_exporter_version }}.tar.gz"
     mode: '0644'
 
-- name: Extract node exporter
+- name: Unpack node exporter
   ansible.builtin.unarchive:
-    src: "/tmp/{{ node_exporter_archive }}.tar.gz"
-    dest: /tmp/
+    src: "/tmp/node_exporter-{{ mylab_node_exporter_version }}.tar.gz"
+    dest: /tmp
     remote_src: true
-    creates: "/tmp/{{ node_exporter_archive }}/node_exporter"
+    creates: "/tmp/node_exporter-{{ mylab_node_exporter_version }}.linux-amd64/node_exporter"
 
 - name: Install node exporter binary
   ansible.builtin.copy:
-    src: "/tmp/{{ node_exporter_archive }}/node_exporter"
+    src: "/tmp/node_exporter-{{ mylab_node_exporter_version }}.linux-amd64/node_exporter"
     dest: /usr/local/bin/node_exporter
-    owner: root
-    group: root
     mode: '0755'
     remote_src: true
-  notify: Restart node exporter
+  notify: Restart node_exporter
 
-- name: Install node exporter systemd unit
-  ansible.builtin.template:
-    src: node_exporter.service.j2
+- name: Install node exporter service
+  ansible.builtin.copy:
     dest: /etc/systemd/system/node_exporter.service
-    owner: root
-    group: root
     mode: '0644'
+    content: |
+      [Unit]
+      Description=Prometheus Node Exporter
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      User={{ mylab_node_exporter_user }}
+      Group={{ mylab_node_exporter_user }}
+      ExecStart=/usr/local/bin/node_exporter --web.listen-address=:{{ mylab_node_exporter_port }}
+      Restart=always
+      RestartSec=3
+
+      [Install]
+      WantedBy=multi-user.target
   notify:
     - Reload systemd
-    - Restart node exporter
+    - Restart node_exporter
 
-- name: Enable node exporter
+- name: Ensure node exporter is enabled
   ansible.builtin.service:
     name: node_exporter
     enabled: true

@@ -1,13 +1,20 @@
-mgmt_interface: ens18
-mgmt_ip_cidr: 10.10.0.32/24
-mgmt_gateway: 10.10.0.1
-leaf_bridges:
-  - name: br-fabric
-    ports: [ens19, ens20, ens21]
-leaf_vlans:
-  - id: 110
-    name: prod1-node
-leaf_svis:
-  - name: br-fabric.110
-    raw_device: br-fabric
-    address: 10.110.0.3/24
+---
+node_role: leaf
+dc: dc1
+leaf_asn: 65110
+router_id: 10.255.1.12
+loopback_ip: 10.255.1.12/32
+mylab_primary_ip: 10.10.10.22
+mylab_primary_interface: ens18
+frr_interfaces:
+  - { name: ens18, description: mgmt, address: 10.10.10.22/24 }
+  - { name: ens19, description: to-r1-dc1, address: 172.16.255.10/30 }
+  - { name: ens20, description: to-r2-dc1, address: 172.16.255.18/30 }
+  - { name: ens21, description: server-uplink-b }
+leaf_bgp_neighbors:
+  - { ip: 172.16.255.9, asn: 65001, desc: r1-dc1 }
+  - { ip: 172.16.255.17, asn: 65001, desc: r2-dc1 }
+leaf_vlan_interfaces:
+  - { vlan: 10, ifname: ens21.10, address: 10.10.10.2/24 }
+  - { vlan: 20, ifname: ens21.20, address: 10.10.20.2/24 }
+  - { vlan: 30, ifname: ens21.30, address: 10.10.30.2/24 }

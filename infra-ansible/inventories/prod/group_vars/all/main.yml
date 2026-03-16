@@ -1,113 +1,137 @@
-lab_domain: lab
-lab_timezone: Europe/Amsterdam
+---
+mylab_domain: lab
+mylab_environment: prod
+mylab_timezone: Europe/Amsterdam
 
-admin_group: opsadmin
-admin_users:
-  - username: ansible
-    uid: 2000
-    groups: [sudo, adm]
-    ssh_keys:
-      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMYLABREPLACEWITHYOURREALKEY ansible@mylab"
-  - username: omid
-    uid: 2001
-    groups: [sudo, adm]
-    ssh_keys:
-      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIUSERREPLACEWITHYOURREALKEY omid@mylab"
+mylab_admin_group: adminops
+mylab_admin_users:
+  - name: automation
+    shell: /bin/bash
+    groups: ['sudo', '{{ mylab_admin_group }}']
+    ssh_authorized_keys:
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIREPLACE_THIS_WITH_REAL_AUTOMATION_KEY automation@mylab"
+  - name: omid
+    shell: /bin/bash
+    groups: ['sudo', '{{ mylab_admin_group }}']
+    ssh_authorized_keys:
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIREPLACE_THIS_WITH_REAL_OMID_KEY omid@mylab"
 
-package_state: present
-base_packages:
+mylab_disable_password_auth: true
+mylab_disable_root_ssh: true
+mylab_manage_firewall: true
+
+mylab_dns_servers:
+  - 1.1.1.1
+  - 9.9.9.9
+
+mylab_ntp_servers:
+  - time.cloudflare.com
+  - pool.ntp.org
+
+mylab_apt_common_packages:
   - apt-transport-https
-  - ca-certificates
-  - curl
-  - vim
-  - git
-  - jq
-  - rsync
   - bash-completion
-  - unzip
-  - tcpdump
-  - lsof
-  - htop
-  - dnsutils
-  - net-tools
-  - iproute2
-  - arping
-  - traceroute
-  - mtr-tiny
-  - gnupg
-  - gpg
-  - software-properties-common
-  - python3
-  - python3-apt
-  - python3-pip
-  - sudo
+  - ca-certificates
   - chrony
+  - conntrack
+  - curl
+  - ethtool
+  - git
+  - gnupg
+  - htop
+  - ifupdown2
+  - iproute2
+  - ipset
+  - iptables
+  - iputils-ping
+  - jq
+  - lsb-release
+  - lsof
+  - ncdu
+  - net-tools
   - nftables
-  - acl
+  - rsync
+  - socat
+  - sudo
+  - tcpdump
+  - traceroute
+  - unzip
+  - vim
+  - wget
 
-chrony_pool:
-  - 0.pool.ntp.org iburst
-  - 1.pool.ntp.org iburst
-  - 2.pool.ntp.org iburst
-  - 3.pool.ntp.org iburst
+mylab_journald_system_max_use: 1G
+mylab_journald_runtime_max_use: 256M
 
-sysctl_common:
-  net.ipv4.ip_forward: 1
-  net.ipv4.conf.all.rp_filter: 0
-  net.ipv4.conf.default.rp_filter: 0
-  net.ipv4.conf.all.accept_redirects: 0
-  net.ipv4.conf.default.accept_redirects: 0
-  net.ipv4.conf.all.send_redirects: 0
-  net.ipv4.conf.default.send_redirects: 0
-  net.ipv4.tcp_syncookies: 1
-  net.ipv4.icmp_echo_ignore_broadcasts: 1
-  net.ipv6.conf.all.accept_redirects: 0
-  net.ipv6.conf.default.accept_redirects: 0
-  kernel.kptr_restrict: 2
-  kernel.dmesg_restrict: 1
-  kernel.yama.ptrace_scope: 1
+mylab_kernel_modules_common:
+  - br_netfilter
+  - overlay
+  - nf_conntrack
+
+mylab_sysctl_common:
   fs.inotify.max_user_instances: 8192
   fs.inotify.max_user_watches: 1048576
+  kernel.dmesg_restrict: 1
+  kernel.kptr_restrict: 2
+  kernel.panic: 10
+  kernel.panic_on_oops: 1
+  net.bridge.bridge-nf-call-ip6tables: 1
+  net.bridge.bridge-nf-call-iptables: 1
+  net.ipv4.conf.all.accept_redirects: 0
+  net.ipv4.conf.all.log_martians: 1
+  net.ipv4.conf.all.rp_filter: 0
+  net.ipv4.conf.default.accept_redirects: 0
+  net.ipv4.ip_forward: 1
+  net.ipv4.tcp_syncookies: 1
+  net.ipv6.conf.all.accept_redirects: 0
+  net.ipv6.conf.default.accept_redirects: 0
+  vm.max_map_count: 262144
   vm.swappiness: 10
 
-journald_storage: persistent
-journald_system_max_use: 512M
-journald_max_retention_sec: 1month
+mylab_node_exporter_version: "1.8.2"
+mylab_node_exporter_user: node_exporter
+mylab_node_exporter_port: 9100
 
-node_exporter_version: 1.8.2
-node_exporter_user: node-exp
-node_exporter_port: 9100
+mylab_containerd_sandbox_image: registry.k8s.io/pause:3.10
 
-ssh_port: 22
-ssh_permit_root_login: 'no'
-ssh_password_authentication: 'no'
-ssh_pubkey_authentication: 'yes'
-ssh_x11_forwarding: 'no'
-ssh_allow_users:
-  - ansible
-  - omid
+mylab_kubernetes_modules:
+  - overlay
+  - br_netfilter
 
-nft_base_allowed_tcp:
-  - 22
-  - 9100
-nft_base_allowed_udp: []
+mylab_kubernetes_sysctl:
+  net.bridge.bridge-nf-call-iptables: 1
+  net.bridge.bridge-nf-call-ip6tables: 1
+  net.ipv4.ip_forward: 1
 
-containerd_version_channel: stable
-kubernetes_version: "1.31"
-kubernetes_apt_version: "1.31"
-k8s_allowed_tcp_control_plane:
-  - 6443
-  - 2379-2380
-  - 10250
-  - 10257
-  - 10259
-k8s_allowed_tcp_worker:
-  - 10250
-  - 30000-32767
+mylab_allowed_ssh_sources:
+  - 10.10.0.10/32
 
-pod_network_cidr: 10.244.0.0/16
-service_network_cidr: 10.96.0.0/12
+mylab_management_subnet: 10.10.0.0/16
 
-frr_asn_map:
-  dc1: 65001
-  dc2: 65002
+mylab_vlan_definitions:
+  - { id: 10, name: mgmt }
+  - { id: 20, name: infra }
+  - { id: 30, name: k8s-dc1 }
+  - { id: 31, name: k8s-dc2 }
+  - { id: 40, name: storage }
+  - { id: 50, name: public-services }
+  - { id: 99, name: transit }
+
+mylab_cluster_map:
+  prod1:
+    dc: dc1
+    control_plane:
+      - prod1-cp1.dc1.lab
+    workers:
+      - prod1-w1.dc1.lab
+      - prod1-w2.dc1.lab
+    pod_cidr: 10.244.0.0/16
+    service_cidr: 10.96.0.0/16
+  prod2:
+    dc: dc2
+    control_plane:
+      - prod2-cp1.dc2.lab
+    workers:
+      - prod2-w1.dc2.lab
+      - prod2-w2.dc2.lab
+    pod_cidr: 10.245.0.0/16
+    service_cidr: 10.97.0.0/16

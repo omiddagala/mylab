@@ -1,46 +1,67 @@
 ---
 - name: Disable swap immediately
   ansible.builtin.command: swapoff -a
-  when: ansible_swaptotal_mb | int > 0
-  changed_when: true
+  when: kubernetes_disable_swap
 
 - name: Disable swap in fstab
   ansible.builtin.replace:
     path: /etc/fstab
-    regexp: '^(.*\s+swap\s+.*)$'
+    regexp: '^([^#].*\s+swap\s+.*)$'
     replace: '# \1'
+  when: kubernetes_disable_swap
 
-- name: Ensure keyrings directory exists
+- name: Configure kubernetes kernel modules
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/kubernetes.conf
+    mode: '0644'
+    content: |
+      {% for module in mylab_kubernetes_modules %}
+      {{ module }}
+      {% endfor %}
+  notify: Load kubernetes kernel modules
+
+- name: Configure kubernetes sysctl
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/90-kubernetes.conf
+    mode: '0644'
+    content: |
+      {% for key, value in mylab_kubernetes_sysctl.items() %}
+      {{ key }} = {{ value }}
+      {% endfor %}
+  notify: Reload sysctl
+
+- name: Create apt keyring directory
   ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
     mode: '0755'
 
-- name: Install Kubernetes apt key
+- name: Add Kubernetes apt key
   ansible.builtin.get_url:
-    url: "https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_apt_version }}/deb/Release.key"
+    url: https://pkgs.k8s.io/core:/stable:/{{ kubernetes_repo_version }}/deb/Release.key
     dest: /etc/apt/keyrings/kubernetes-apt-keyring.asc
     mode: '0644'
 
-- name: Install Kubernetes apt repo
+- name: Add Kubernetes repository
   ansible.builtin.copy:
     dest: /etc/apt/sources.list.d/kubernetes.list
-    content: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_apt_version }}/deb/ /\n"
     mode: '0644'
+    content: |
+      deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/{{ kubernetes_repo_version }}/deb/ /
 
 - name: Install Kubernetes packages
   ansible.builtin.apt:
     update_cache: true
-    name: "{{ kubernetes_packages }}"
+    name: "{{ kubernetes_install_tools }}"
     state: present
 
 - name: Hold Kubernetes packages
   ansible.builtin.dpkg_selections:
     name: "{{ item }}"
     selection: hold
-  loop: "{{ kubernetes_packages }}"
+  loop: "{{ kubernetes_install_tools }}"
 
-- name: Enable kubelet
+- name: Ensure kubelet is enabled
   ansible.builtin.service:
     name: kubelet
     enabled: true

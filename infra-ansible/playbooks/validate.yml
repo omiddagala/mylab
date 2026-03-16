@@ -1,0 +1,14 @@
+---
+- name: Validate mylab alignment
+  hosts: linux
+  gather_facts: true
+  tasks:
+    - name: Assert aligned host vars exist
+      ansible.builtin.assert:
+        that:
+          - mylab_primary_ip is defined
+          - mylab_primary_interface is defined
+    - name: Assert dev hosts are absent
+      ansible.builtin.assert:
+        that:
+          - "'dev' not in inventory_hostname"

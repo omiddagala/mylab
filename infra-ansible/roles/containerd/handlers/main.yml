@@ -1,4 +1,12 @@
 ---
+- name: Load containerd kernel modules
+  ansible.builtin.shell: |
+    set -euo pipefail
+    modprobe overlay
+    modprobe br_netfilter
+  args:
+    executable: /bin/bash
+
 - name: Restart containerd
   ansible.builtin.service:
     name: containerd

@@ -1,26 +1,32 @@
 ---
 - name: Install bastion packages
   ansible.builtin.apt:
-    name: "{{ bastion_extra_packages | default([]) }}"
+    name:
+      - fail2ban
+      - tmux
+      - mosh
     state: present
-  when: (bastion_extra_packages | default([])) | length > 0
 
-- name: Create ops workspace directories
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: ansible
-    group: ansible
-    mode: '0750'
-  loop:
-    - /home/ansible/.ssh
-    - /home/ansible/bin
-    - /srv/mylab
+- name: Configure fail2ban
+  ansible.builtin.copy:
+    dest: /etc/fail2ban/jail.d/sshd.local
+    mode: '0644'
+    content: |
+      [sshd]
+      enabled = true
+      port = ssh
+      logpath = %(sshd_log)s
+      maxretry = 5
+      bantime = 1h
+      findtime = 10m
+  when: bastion_fail2ban_enabled
+  notify: Restart fail2ban
 
-- name: Install simple ssh config
-  ansible.builtin.template:
-    src: ssh_config.j2
-    dest: /home/ansible/.ssh/config
-    owner: ansible
-    group: ansible
-    mode: '0600'
+- name: Configure motd
+  ansible.builtin.copy:
+    dest: /etc/motd
+    mode: '0644'
+    content: |
+      Authorized bastion host for mylab.
+      All access is logged.
+  when: bastion_enable_motd

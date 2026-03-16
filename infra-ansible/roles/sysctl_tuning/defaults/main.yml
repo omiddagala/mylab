@@ -1,1 +1,1 @@
-sysctl_merged: "{{ sysctl_common | combine(sysctl_k8s | default({})) }}"
+---

@@ -1,6 +1,7 @@
 ---
 - name: Install node exporter
-  hosts: all
+  hosts: linux
+  gather_facts: true
   become: true
   roles:
     - node_exporter

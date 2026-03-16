@@ -3,3 +3,8 @@
   ansible.builtin.service:
     name: networking
     state: restarted
+
+- name: Restart frr
+  ansible.builtin.service:
+    name: frr
+    state: restarted

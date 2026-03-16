@@ -1,9 +1,3 @@
-bastion_extra_packages:
-  - tmux
-  - mosh
-  - tree
-  - nmap
-  - ripgrep
-  - fzf
-  - age
-  - sops
+---
+bastion_fail2ban_enabled: true
+bastion_enable_motd: true

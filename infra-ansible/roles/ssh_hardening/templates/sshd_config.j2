@@ -1,19 +1,20 @@
-Port {{ ssh_port }}
+Port 22
 Protocol 2
-PermitRootLogin {{ ssh_permit_root_login }}
-PasswordAuthentication {{ ssh_password_authentication }}
+PermitRootLogin {{ 'no' if mylab_disable_root_ssh else 'prohibit-password' }}
+PasswordAuthentication {{ 'no' if mylab_disable_password_auth else 'yes' }}
 KbdInteractiveAuthentication no
 ChallengeResponseAuthentication no
 UsePAM yes
-PubkeyAuthentication {{ ssh_pubkey_authentication }}
-X11Forwarding {{ ssh_x11_forwarding }}
-AllowUsers {{ ssh_allow_users | join(' ') }}
-ClientAliveInterval {{ ssh_client_alive_interval }}
-ClientAliveCountMax {{ ssh_client_alive_count_max }}
+X11Forwarding no
+AllowTcpForwarding yes
+AllowAgentForwarding yes
+PermitTunnel no
+ClientAliveInterval 300
+ClientAliveCountMax 2
 LoginGraceTime 30
 MaxAuthTries 3
-PermitEmptyPasswords no
-PermitTunnel no
-AllowAgentForwarding no
-AllowTcpForwarding no
+MaxSessions 20
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+AllowGroups sudo {{ mylab_admin_group }}
 Subsystem sftp /usr/lib/openssh/sftp-server

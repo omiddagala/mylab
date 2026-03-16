@@ -1,13 +1,21 @@
-mgmt_interface: ens18
-mgmt_ip_cidr: 10.20.0.12/24
-mgmt_gateway: 10.20.0.1
-frr_router_id: 10.255.2.2
-frr_bgp_asn: 65002
-frr_bgp_neighbors:
-  - address: 10.255.2.1
-    remote_as: 65002
-    description: r1-dc2
-    next_hop_self: true
-frr_ospf_networks:
-  - prefix: 10.20.0.0/24
-    area: 0.0.0.0
+---
+node_role: router
+dc: dc2
+router_asn: 65002
+router_id: 10.255.2.2
+loopback_ip: 10.255.2.2/32
+mylab_primary_ip: 10.20.10.12
+mylab_primary_interface: ens18
+frr_interfaces:
+  - { name: ens18, description: mgmt, address: 10.20.10.12/24 }
+  - { name: ens19, description: transit-to-r1-dc2, address: 172.16.255.34/30 }
+  - { name: ens20, description: uplink-to-leaf1-dc2, address: 172.16.255.45/30 }
+  - { name: ens21, description: uplink-to-leaf2-dc2, address: 172.16.255.49/30 }
+router_bgp_neighbors:
+  - { ip: 172.16.255.46, asn: 65120, desc: leaf1-dc2 }
+  - { ip: 172.16.255.50, asn: 65120, desc: leaf2-dc2 }
+  - { ip: 172.16.255.33, asn: 65002, desc: r1-dc2 }
+router_ospf_networks:
+  - 172.16.255.32/30
+  - 172.16.255.44/30
+  - 172.16.255.48/30

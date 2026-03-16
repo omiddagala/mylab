@@ -1,0 +1,24 @@
+auto lo
+iface lo inet loopback
+
+{% for iface in frr_interfaces %}
+{% if iface.address is defined %}
+auto {{ iface.name }}
+iface {{ iface.name }} inet static
+    address {{ iface.address }}
+{% else %}
+auto {{ iface.name }}
+iface {{ iface.name }} inet manual
+{% endif %}
+{% endfor %}
+
+auto lo:1
+iface lo:1 inet static
+    address {{ loopback_ip }}
+
+{% for svi in leaf_vlan_interfaces %}
+auto {{ svi.ifname }}
+iface {{ svi.ifname }} inet static
+    vlan-raw-device {{ frr_interfaces[-1].name }}
+    address {{ svi.address }}
+{% endfor %}

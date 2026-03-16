@@ -1,2 +1,9 @@
 ---
-# no handlers required
+- name: Load common kernel modules
+  ansible.builtin.shell: |
+    set -euo pipefail
+    while read -r module; do
+      [ -n "$module" ] && /sbin/modprobe "$module" || true
+    done < /etc/modules-load.d/mylab-common.conf
+  args:
+    executable: /bin/bash

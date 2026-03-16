@@ -1,38 +1,43 @@
 ---
-- name: Ensure required router variables are defined
-  ansible.builtin.assert:
-    that:
-      - frr_router_id is defined
-      - frr_bgp_asn is defined
-      - frr_bgp_neighbors is defined
-    fail_msg: "Router host_vars must define frr_router_id, frr_bgp_asn and frr_bgp_neighbors."
+- name: Install FRR
+  ansible.builtin.apt:
+    name:
+      - frr
+      - frr-pythontools
+    state: present
 
-- name: Enable FRR daemons
+- name: Configure router interfaces
+  ansible.builtin.template:
+    src: interfaces-router.j2
+    dest: /etc/network/interfaces.d/mylab-router.cfg
+    mode: '0644'
+  notify: Restart networking
+
+- name: Configure FRR daemons
   ansible.builtin.copy:
     dest: /etc/frr/daemons
-    owner: frr
-    group: frr
-    mode: '0640'
+    mode: '0644'
     content: |
-      bgpd=yes
-      ospfd=yes
-      staticd=yes
-      zebra=yes
-      mgmtd=yes
-      vtysh_enable=yes
+      zebra={{ router_frr_manage_daemons.zebra }}
+      bgpd={{ router_frr_manage_daemons.bgpd }}
+      ospfd={{ router_frr_manage_daemons.ospfd }}
+      staticd={{ router_frr_manage_daemons.staticd }}
   notify: Restart frr
 
-- name: Configure FRR defaults
-  ansible.builtin.copy:
+- name: Configure FRR router config
+  ansible.builtin.template:
+    src: frr-router.conf.j2
     dest: /etc/frr/frr.conf
+    mode: '0640'
     owner: frr
     group: frr
-    mode: '0640'
-    content: "{{ lookup('template', 'frr.conf.j2') }}"
   notify: Restart frr
 
-- name: Enable FRR
+- name: Ensure services enabled
   ansible.builtin.service:
-    name: "{{ frr_service_name }}"
+    name: "{{ item }}"
     enabled: true
     state: started
+  loop:
+    - networking
+    - frr

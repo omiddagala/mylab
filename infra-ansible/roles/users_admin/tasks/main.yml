@@ -1,32 +1,39 @@
 ---
 - name: Ensure admin group exists
   ansible.builtin.group:
-    name: "{{ admin_group }}"
+    name: "{{ mylab_admin_group }}"
     state: present
 
 - name: Ensure admin users exist
   ansible.builtin.user:
-    name: "{{ item.username }}"
-    uid: "{{ item.uid | default(omit) }}"
-    shell: /bin/bash
-    create_home: "{{ admin_users_create_home }}"
-    groups: "{{ (item.groups | default([])) + [admin_group] }}"
+    name: "{{ item.name }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    groups: "{{ item.groups | default([]) }}"
     append: true
+    create_home: true
     state: present
-  loop: "{{ admin_users }}"
+  loop: "{{ mylab_admin_users }}"
+
+- name: Ensure SSH directories exist
+  ansible.builtin.file:
+    path: "/home/{{ item.name }}/.ssh"
+    state: directory
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: '0700'
+  loop: "{{ mylab_admin_users }}"
 
 - name: Install authorized keys
   ansible.posix.authorized_key:
-    user: "{{ item.0.username }}"
+    user: "{{ item.0.name }}"
     key: "{{ item.1 }}"
     state: present
-  loop: "{{ admin_users | subelements('ssh_keys') }}"
+  loop: "{{ mylab_admin_users | subelements('ssh_authorized_keys', skip_missing=True) }}"
 
-- name: Configure passwordless sudo for admin group
+- name: Configure sudoers for admin group
   ansible.builtin.copy:
-    dest: /etc/sudoers.d/90-opsadmin
-    content: "%{{ admin_group }} ALL=(ALL) NOPASSWD:ALL\n"
-    owner: root
-    group: root
+    dest: /etc/sudoers.d/90-mylab-admin
     mode: '0440'
-    validate: /usr/sbin/visudo -cf %s
+    validate: '/usr/sbin/visudo -cf %s'
+    content: |
+      %{{ mylab_admin_group }} ALL=(ALL) NOPASSWD:ALL

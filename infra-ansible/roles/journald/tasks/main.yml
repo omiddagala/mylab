@@ -1,9 +1,12 @@
 ---
-- name: Configure journald retention
-  ansible.builtin.template:
-    src: journald.conf.j2
-    dest: /etc/systemd/journald.conf
-    owner: root
-    group: root
+- name: Configure journald persistence
+  ansible.builtin.copy:
+    dest: /etc/systemd/journald.conf.d/10-mylab.conf
     mode: '0644'
+    content: |
+      [Journal]
+      Storage=persistent
+      Compress=yes
+      SystemMaxUse={{ mylab_journald_system_max_use }}
+      RuntimeMaxUse={{ mylab_journald_runtime_max_use }}
   notify: Restart journald

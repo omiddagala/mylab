@@ -1,18 +1,44 @@
 ---
-- name: Ensure leaf variables are defined
-  ansible.builtin.assert:
-    that:
-      - mgmt_interface is defined
-      - leaf_bridges is defined
-      - leaf_vlans is defined
-      - leaf_svis is defined
-    fail_msg: "Leaf host_vars must define mgmt_interface, leaf_bridges, leaf_vlans and leaf_svis."
+- name: Install FRR and vlan packages
+  ansible.builtin.apt:
+    name:
+      - frr
+      - vlan
+      - bridge-utils
+    state: present
 
-- name: Install leaf networking config
+- name: Configure leaf interfaces
   ansible.builtin.template:
-    src: interfaces.j2
-    dest: /etc/network/interfaces.d/mylab.cfg
-    owner: root
-    group: root
+    src: interfaces-leaf.j2
+    dest: /etc/network/interfaces.d/mylab-leaf.cfg
     mode: '0644'
   notify: Restart networking
+
+- name: Configure FRR daemons
+  ansible.builtin.copy:
+    dest: /etc/frr/daemons
+    mode: '0644'
+    content: |
+      zebra={{ leaf_frr_manage_daemons.zebra }}
+      bgpd={{ leaf_frr_manage_daemons.bgpd }}
+      ospfd={{ leaf_frr_manage_daemons.ospfd }}
+      staticd={{ leaf_frr_manage_daemons.staticd }}
+  notify: Restart frr
+
+- name: Configure FRR leaf config
+  ansible.builtin.template:
+    src: frr-leaf.conf.j2
+    dest: /etc/frr/frr.conf
+    mode: '0640'
+    owner: frr
+    group: frr
+  notify: Restart frr
+
+- name: Ensure services enabled
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - networking
+    - frr

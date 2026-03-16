@@ -1,6 +1,7 @@
 ---
-- name: OS bootstrap baseline
-  hosts: all
+- name: Bootstrap Linux hosts
+  hosts: linux
+  gather_facts: true
   become: true
   roles:
     - common_base
@@ -10,4 +11,3 @@
     - time_sync
     - journald
     - sysctl_tuning
-    - nftables_base

@@ -1,0 +1,15 @@
+auto lo
+iface lo inet loopback
+
+{% for iface in frr_interfaces %}
+auto {{ iface.name }}
+iface {{ iface.name }} inet static
+    address {{ iface.address }}
+{% if iface.description is defined %}
+    up ip link set dev {{ iface.name }} alias "{{ iface.description }}"
+{% endif %}
+{% endfor %}
+
+auto lo:1
+iface lo:1 inet static
+    address {{ loopback_ip }}

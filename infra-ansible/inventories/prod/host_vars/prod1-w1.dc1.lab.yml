@@ -1,6 +1,11 @@
-mgmt_interface: ens18
-mgmt_ip_cidr: 10.10.0.22/24
-mgmt_gateway: 10.10.0.1
-k8s_node_labels:
-  topology.kubernetes.io/zone: dc1
-  node-role.kubernetes.io/worker: ""
+---
+node_role: kube_worker
+cluster_name: prod1
+dc: dc1
+mylab_primary_ip: 10.10.30.21
+mylab_primary_interface: ens18
+network_interfaces:
+  - name: ens18
+    address: 10.10.30.21/24
+    gateway: 10.10.30.1
+    dns: "{{ mylab_dns_servers }}"

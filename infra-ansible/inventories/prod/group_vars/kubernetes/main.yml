@@ -1,0 +1,8 @@
+---
+kubernetes_disable_swap: true
+kubernetes_install_tools:
+  - kubelet
+  - kubeadm
+  - kubectl
+kubernetes_repo_version: "v1.31"
+containerd_systemd_cgroup: true
