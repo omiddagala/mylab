@@ -1,0 +1,6 @@
+---
+nft_enabled: true
+allow_tcp_forwarding: false
+allow_agent_forwarding: false
+ssh_allowed_cidrs:
+  - 10.10.10.10/32

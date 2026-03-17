@@ -1,0 +1,4 @@
+---
+ssh_allowed_cidrs: "{{ mylab_operator_ssh_cidrs }}"
+allow_tcp_forwarding: "yes"
+allow_agent_forwarding: "yes"

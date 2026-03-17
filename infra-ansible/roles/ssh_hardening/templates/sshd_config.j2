@@ -6,8 +6,8 @@ KbdInteractiveAuthentication no
 ChallengeResponseAuthentication no
 UsePAM yes
 X11Forwarding no
-AllowTcpForwarding yes
-AllowAgentForwarding yes
+AllowTcpForwarding {{ 'yes' if (mylab_ssh_allow_tcp_forwarding | default(false)) else 'no' }}
+AllowAgentForwarding {{ 'yes' if (mylab_ssh_allow_agent_forwarding | default(false)) else 'no' }}
 PermitTunnel no
 ClientAliveInterval 300
 ClientAliveCountMax 2

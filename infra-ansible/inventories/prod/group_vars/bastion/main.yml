@@ -1,3 +1,9 @@
 ---
 bastion_fail2ban_enabled: true
 bastion_enable_motd: true
+
+ansible_ssh_common_args: ""
+
+mylab_allowed_ssh_sources: "{{ mylab_operator_ssh_cidrs }}"
+mylab_ssh_allow_tcp_forwarding: true
+mylab_ssh_allow_agent_forwarding: true

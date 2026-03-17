@@ -1,27 +1,37 @@
 #!/usr/sbin/nft -f
+{% set ssh_sources = hostvars[inventory_hostname].mylab_allowed_ssh_sources | default(mylab_allowed_ssh_sources) %}
 flush ruleset
 
 table inet filter {
   set ssh_admin_sources {
     type ipv4_addr
     flags interval
-    elements = { {% for src in mylab_allowed_ssh_sources %}{{ src }}{% if not loop.last %}, {% endif %}{% endfor %} }
+    elements = {
+      {% for src in ssh_sources %}
+      {{ src }}{% if not loop.last %},{% endif %}
+      {% endfor %}
+    }
   }
 
   chain input {
-    type filter hook input priority 0; policy drop;
+    type filter hook input priority 0;
+    policy drop;
+
     iifname "lo" accept
     ct state established,related accept
     ip protocol icmp accept
+
     ip saddr @ssh_admin_sources tcp dport 22 accept
     tcp dport {{ mylab_node_exporter_port }} ip saddr {{ mylab_management_subnet }} accept
   }
 
   chain forward {
-    type filter hook forward priority 0; policy accept;
+    type filter hook forward priority 0;
+    policy accept;
   }
 
   chain output {
-    type filter hook output priority 0; policy accept;
+    type filter hook output priority 0;
+    policy accept;
   }
 }

@@ -1,5 +1,5 @@
 #!/usr/sbin/nft -f
-
+{% set ssh_sources = hostvars[inventory_hostname].ssh_allowed_cidrs | default(mylab_guest_default_ssh_allowed_cidrs | default(mylab_mgmt_cidrs)) %}
 flush ruleset
 
 table inet filter {
@@ -11,22 +11,22 @@ table inet filter {
     ct state established,related accept
     ct state invalid drop
 
-{% if mylab_nft_allow_icmp %}
+    {% if mylab_nft_allow_icmp %}
     ip protocol icmp accept
     ip6 nexthdr icmpv6 accept
-{% endif %}
+    {% endif %}
 
-{% for cidr in mylab_mgmt_cidrs %}
+    {% for cidr in ssh_sources %}
     ip saddr {{ cidr }} tcp dport 22 accept
-{% endfor %}
+    {% endfor %}
 
-{% for port in (hostvars[inventory_hostname].nft_extra_tcp_in | default(mylab_nft_extra_tcp_in)) %}
+    {% for port in (hostvars[inventory_hostname].nft_extra_tcp_in | default(mylab_nft_extra_tcp_in)) %}
     tcp dport {{ port }} accept
-{% endfor %}
+    {% endfor %}
 
-{% for port in (hostvars[inventory_hostname].nft_extra_udp_in | default(mylab_nft_extra_udp_in)) %}
+    {% for port in (hostvars[inventory_hostname].nft_extra_udp_in | default(mylab_nft_extra_udp_in)) %}
     udp dport {{ port }} accept
-{% endfor %}
+    {% endfor %}
   }
 
   chain forward {

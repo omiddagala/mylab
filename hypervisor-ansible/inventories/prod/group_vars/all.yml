@@ -11,6 +11,10 @@ mylab_dns_servers:
   - 9.9.9.9
 
 mylab_bastion_ip: 10.10.10.10
+
+mylab_operator_ssh_cidrs:
+  - 198.51.100.10/32
+
 mylab_mgmt_cidrs:
   - 10.10.10.0/24
   - 10.20.10.0/24
@@ -90,6 +94,9 @@ mylab_rp_filter_mode: 1
 mylab_nft_allow_icmp: true
 mylab_nft_extra_tcp_in: []
 mylab_nft_extra_udp_in: []
+
+mylab_guest_default_ssh_allowed_cidrs:
+  - 10.10.10.10/32
 
 mylab_guest_default_memory_mb: 8192
 mylab_guest_default_vcpus: 2
