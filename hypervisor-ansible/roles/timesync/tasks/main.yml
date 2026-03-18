@@ -1,17 +1,16 @@
----
-- name: Configure systemd-timesyncd
+- name: Configure chrony
   ansible.builtin.copy:
     dest: "{{ timesync_config_path }}"
     owner: root
     group: root
     mode: "0644"
     content: |
-      [Time]
-      NTP={{ mylab_ntp_servers | join(' ') }}
-      FallbackNTP={{ timesync_fallback_ntp }}
-  notify: Restart timesyncd
+      {% for server in mylab_ntp_servers %}
+      pool {{ server }} iburst
+      {% endfor %}
+  notify: Restart chrony
 
-- name: Ensure systemd-timesyncd is enabled and started
+- name: Ensure chrony is enabled and started
   ansible.builtin.service:
     name: "{{ timesync_service_name }}"
     state: started

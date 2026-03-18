@@ -20,5 +20,5 @@
     enabled: true
   loop:
     - ssh
-    - systemd-timesyncd
+    - chrony
   ignore_errors: true
