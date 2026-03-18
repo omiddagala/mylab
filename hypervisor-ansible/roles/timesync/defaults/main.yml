@@ -1,3 +1,4 @@
 ---
-timesync_service_name: chrony
-timesync_config_path: /etc/chrony/chrony.conf
+timesync_service_name: systemd-timesyncd
+timesync_config_path: /etc/systemd/timesyncd.conf
+timesync_fallback_ntp: pool.ntp.org
