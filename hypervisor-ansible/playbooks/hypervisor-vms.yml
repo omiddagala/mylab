@@ -1,8 +1,6 @@
 ---
-- name: Provision VMs on hypervisors
+- name: Render and manage mylab VMs
   hosts: hypervisors
   become: true
-  gather_facts: true
-
   roles:
-    - vm_provision
+    - role: qemu_vm

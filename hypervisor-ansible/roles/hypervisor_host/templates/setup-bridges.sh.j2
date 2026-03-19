@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+create_bridge() {
+  local name="$1"
+  local cidr="$2"
+
+  ip link show "$name" >/dev/null 2>&1 || ip link add name "$name" type bridge
+  ip link set "$name" up
+
+  if ! ip -4 addr show dev "$name" | grep -q "${cidr%%/*}"; then
+    ip addr flush dev "$name" || true
+    ip addr add "$cidr" dev "$name"
+  fi
+}
+
+create_bridge br-mgmt "{{ mylab_mgmt_bridge_cidr }}"
+create_bridge br-wan "{{ mylab_wan_bridge_cidr }}"
+create_bridge br-dc1 "{{ mylab_dc1_bridge_cidr }}"
+create_bridge br-dc2 "{{ mylab_dc2_bridge_cidr }}"
+
+{% if mylab_upstream_mode == 'bridged' %}
+ip link set {{ mylab_uplink_interface }} master br-wan
+ip link set {{ mylab_uplink_interface }} up
+{% endif %}

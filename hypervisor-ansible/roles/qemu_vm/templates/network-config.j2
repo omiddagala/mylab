@@ -1,0 +1,17 @@
+version: 2
+ethernets:
+{% for nic in item.networks %}
+  eth{{ loop.index0 }}:
+    dhcp4: false
+    addresses:
+      - {{ nic.ip }}
+{% if nic.gateway is defined %}
+    routes:
+      - to: default
+        via: {{ nic.gateway }}
+{% endif %}
+{% if nic.nameservers is defined %}
+    nameservers:
+      addresses: {{ nic.nameservers | to_json }}
+{% endif %}
+{% endfor %}

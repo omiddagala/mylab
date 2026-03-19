@@ -1,0 +1,14 @@
+[Unit]
+Description=mylab VM {{ item.name }}
+After=network-online.target mylab-bridges.service
+Wants=network-online.target mylab-bridges.service
+
+[Service]
+Type=simple
+ExecStart={{ mylab_scripts_dir }}/{{ item.name }}.sh
+Restart=always
+RestartSec=5
+WorkingDirectory={{ mylab_root_dir }}
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,100 @@
+---
+- name: Load VM definitions from IPAM generated file
+  ansible.builtin.include_vars:
+    file: "{{ mylab_ipam_vm_file }}"
+    name: mylab_ipam
+
+- name: Validate VM definition payload
+  ansible.builtin.assert:
+    that:
+      - mylab_ipam.vms is defined
+      - mylab_ipam.vms | length > 0
+    fail_msg: "No VMs found in {{ mylab_ipam_vm_file }}"
+
+- name: Create per-VM directories
+  ansible.builtin.file:
+    path: "{{ mylab_runtime_dir }}/{{ item.name }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ mylab_ipam.vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Create VM qcow2 disk from base image
+  ansible.builtin.command:
+    cmd: >-
+      qemu-img create -f qcow2 -F qcow2
+      -b {{ mylab_images_dir }}/{{ mylab_cloud_image_name }}
+      {{ mylab_disks_dir }}/{{ item.name }}.qcow2
+      {{ item.disk_gb | default(mylab_default_disk_gb) }}G
+    creates: "{{ mylab_disks_dir }}/{{ item.name }}.qcow2"
+  loop: "{{ mylab_ipam.vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Render user-data
+  ansible.builtin.template:
+    src: user-data.j2
+    dest: "{{ mylab_seed_dir }}/{{ item.name }}-user-data"
+    mode: '0644'
+  loop: "{{ mylab_ipam.vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Render meta-data
+  ansible.builtin.template:
+    src: meta-data.j2
+    dest: "{{ mylab_seed_dir }}/{{ item.name }}-meta-data"
+    mode: '0644'
+  loop: "{{ mylab_ipam.vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Render network-config
+  ansible.builtin.template:
+    src: network-config.j2
+    dest: "{{ mylab_seed_dir }}/{{ item.name }}-network-config"
+    mode: '0644'
+  loop: "{{ mylab_ipam.vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Build cloud-init seed ISO
+  ansible.builtin.command:
+    cmd: >-
+      cloud-localds
+      --network-config={{ mylab_seed_dir }}/{{ item.name }}-network-config
+      {{ mylab_seed_dir }}/{{ item.name }}.iso
+      {{ mylab_seed_dir }}/{{ item.name }}-user-data
+      {{ mylab_seed_dir }}/{{ item.name }}-meta-data
+  loop: "{{ mylab_ipam.vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Render VM launch scripts
+  ansible.builtin.template:
+    src: launch-vm.sh.j2
+    dest: "{{ mylab_scripts_dir }}/{{ item.name }}.sh"
+    mode: '0755'
+  loop: "{{ mylab_ipam.vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Render systemd unit per VM
+  ansible.builtin.template:
+    src: mylab-vm.service.j2
+    dest: "{{ mylab_systemd_dir }}/mylab-vm@{{ item.name }}.service"
+    mode: '0644'
+  loop: "{{ mylab_ipam.vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+  notify: reload systemd
+
+- name: Enable and start VMs
+  ansible.builtin.systemd:
+    name: "mylab-vm@{{ item.name }}.service"
+    enabled: true
+    state: started
+  loop: "{{ mylab_ipam.vms }}"
+  loop_control:
+    label: "{{ item.name }}"

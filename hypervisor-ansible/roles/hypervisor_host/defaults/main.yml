@@ -1,0 +1,12 @@
+---
+mylab_host_packages:
+  - qemu-system-x86
+  - qemu-utils
+  - qemu-block-extra
+  - cloud-image-utils
+  - genisoimage
+  - bridge-utils
+  - cpu-checker
+  - python3-yaml
+  - nftables
+  - rsync

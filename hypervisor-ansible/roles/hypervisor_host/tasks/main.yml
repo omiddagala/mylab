@@ -1,0 +1,80 @@
+---
+- name: Install host packages
+  ansible.builtin.apt:
+    name: "{{ mylab_host_packages }}"
+    state: present
+    update_cache: true
+
+- name: Ensure mylab directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - "{{ mylab_root_dir }}"
+    - "{{ mylab_images_dir }}"
+    - "{{ mylab_disks_dir }}"
+    - "{{ mylab_seed_dir }}"
+    - "{{ mylab_runtime_dir }}"
+    - "{{ mylab_logs_dir }}"
+    - "{{ mylab_scripts_dir }}"
+
+- name: Render bridge helper script
+  ansible.builtin.template:
+    src: setup-bridges.sh.j2
+    dest: /usr/local/sbin/mylab-setup-bridges.sh
+    mode: '0755'
+
+- name: Render systemd unit for host bridges
+  ansible.builtin.copy:
+    dest: "{{ mylab_systemd_dir }}/mylab-bridges.service"
+    mode: '0644'
+    content: |
+      [Unit]
+      Description=Create mylab Linux bridges
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      ExecStart=/usr/local/sbin/mylab-setup-bridges.sh
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: reload systemd
+
+- name: Enable IPv4 forwarding for routed lab uplinks
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    state: present
+    sysctl_set: true
+    reload: true
+
+- name: Render nftables rules for routed lab bridges
+  ansible.builtin.template:
+    src: nftables-mylab.conf.j2
+    dest: /etc/nftables.conf
+    mode: '0644'
+  notify: restart nftables
+
+- name: Enable bridge setup service
+  ansible.builtin.systemd:
+    name: mylab-bridges.service
+    enabled: true
+    state: started
+
+- name: Cache Debian cloud image
+  ansible.builtin.get_url:
+    url: "{{ mylab_cloud_image_url }}"
+    dest: "{{ mylab_images_dir }}/{{ mylab_cloud_image_name }}"
+    mode: '0644'
+
+- name: Enable nftables
+  ansible.builtin.systemd:
+    name: nftables
+    enabled: true
+    state: started

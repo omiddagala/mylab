@@ -1,42 +1,14 @@
 # mylab IPAM
 
-This repository acts as the **Source of Truth** for all network addressing
-in the mylab dual-datacenter environment.
+This repository remains the source of truth for addressing, but now also generates the **hypervisor-facing VM matrix** used by the KVM/QEMU host.
 
-It contains:
+## New generated artifact
 
-- VLAN definitions
-- Subnet allocations
-- Host addressing
-- Loopbacks
-- BGP AS numbers
-- Infrastructure addressing
+- `generated/hypervisor-vms.yaml`
+  - drives CPU, RAM, disk, bridge attachments, static IPs, MAC addresses, and router WAN uplinks for the KVM host
 
-Other infrastructure repositories must **consume this repo**.
+## Consumers
 
-This prevents configuration drift.
-
----
-
-## Datacenters
-
-DC1
-DC2
-
----
-
-## Clusters
-
-prod1 -> DC1  
-prod2 -> DC2  
-dev -> DC1
-
----
-
-## Usage
-
-Repositories consuming this IPAM:
-
-infra-ansible  
-kubespray-inventory  
-network-automation
+- `hypervisor-ansible`
+- `infra-ansible`
+- future Kubespray inventory generation
