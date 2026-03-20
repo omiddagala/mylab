@@ -1,2 +1,3 @@
 ---
 qemu_vm_vmset: []
+vm_console_log_mode: "0644"

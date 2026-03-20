@@ -10,3 +10,5 @@ mylab_host_packages:
   - python3-yaml
   - nftables
   - rsync
+  - ovmf
+  - seabios

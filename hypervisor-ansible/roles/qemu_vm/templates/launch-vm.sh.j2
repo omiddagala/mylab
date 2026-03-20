@@ -11,7 +11,7 @@ exec /usr/bin/qemu-system-x86_64 \
   -nographic \
   -serial file:{{ mylab_logs_dir }}/{{ item.name }}.console.log \
   -drive if=virtio,format=qcow2,file={{ mylab_disks_dir }}/{{ item.name }}.qcow2 \
-  -drive if=virtio,format=raw,file={{ mylab_seed_dir }}/{{ item.name }}.iso,media=cdrom,readonly=on \
+  -drive if=virtio,media=cdrom,format=raw,file={{ mylab_seed_dir }}/{{ item.name }}.iso,readonly=on \
 {% for nic in item.networks %}
   -netdev bridge,id=net{{ loop.index0 }},br={{ nic.bridge }} \
   -device virtio-net-pci,netdev=net{{ loop.index0 }},mac={{ nic.mac }} \

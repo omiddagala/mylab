@@ -11,14 +11,37 @@
       - mylab_ipam.vms | length > 0
     fail_msg: "No VMs found in {{ mylab_ipam_vm_file }}"
 
-- name: Create per-VM directories
+- name: Ensure qemu guest directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "{{ mylab_disks_dir }}"
+    - "{{ mylab_seed_dir }}"
+    - "{{ mylab_runtime_dir }}"
+    - "{{ mylab_logs_dir }}"
+    - "{{ mylab_scripts_dir }}"
+
+- name: Ensure per-VM runtime directories exist
   ansible.builtin.file:
     path: "{{ mylab_runtime_dir }}/{{ item.name }}"
     state: directory
-    mode: '0755'
+    owner: root
+    group: root
+    mode: "0755"
   loop: "{{ mylab_ipam.vms }}"
   loop_control:
     label: "{{ item.name }}"
+
+- name: Ensure Debian cloud image exists
+  ansible.builtin.get_url:
+    url: "{{ mylab_cloud_image_url }}"
+    dest: "{{ mylab_images_dir }}/{{ mylab_cloud_image_name }}"
+    mode: "0644"
+    force: false
 
 - name: Create VM qcow2 disk from base image
   ansible.builtin.command:
@@ -27,6 +50,7 @@
       -b {{ mylab_images_dir }}/{{ mylab_cloud_image_name }}
       {{ mylab_disks_dir }}/{{ item.name }}.qcow2
       {{ item.disk_gb | default(mylab_default_disk_gb) }}G
+  args:
     creates: "{{ mylab_disks_dir }}/{{ item.name }}.qcow2"
   loop: "{{ mylab_ipam.vms }}"
   loop_control:
@@ -36,7 +60,9 @@
   ansible.builtin.template:
     src: user-data.j2
     dest: "{{ mylab_seed_dir }}/{{ item.name }}-user-data"
-    mode: '0644'
+    owner: root
+    group: root
+    mode: "0644"
   loop: "{{ mylab_ipam.vms }}"
   loop_control:
     label: "{{ item.name }}"
@@ -45,7 +71,9 @@
   ansible.builtin.template:
     src: meta-data.j2
     dest: "{{ mylab_seed_dir }}/{{ item.name }}-meta-data"
-    mode: '0644'
+    owner: root
+    group: root
+    mode: "0644"
   loop: "{{ mylab_ipam.vms }}"
   loop_control:
     label: "{{ item.name }}"
@@ -54,7 +82,9 @@
   ansible.builtin.template:
     src: network-config.j2
     dest: "{{ mylab_seed_dir }}/{{ item.name }}-network-config"
-    mode: '0644'
+    owner: root
+    group: root
+    mode: "0644"
   loop: "{{ mylab_ipam.vms }}"
   loop_control:
     label: "{{ item.name }}"
@@ -75,7 +105,9 @@
   ansible.builtin.template:
     src: launch-vm.sh.j2
     dest: "{{ mylab_scripts_dir }}/{{ item.name }}.sh"
-    mode: '0755'
+    owner: root
+    group: root
+    mode: "0755"
   loop: "{{ mylab_ipam.vms }}"
   loop_control:
     label: "{{ item.name }}"
@@ -84,17 +116,22 @@
   ansible.builtin.template:
     src: mylab-vm.service.j2
     dest: "{{ mylab_systemd_dir }}/mylab-vm@{{ item.name }}.service"
-    mode: '0644'
+    owner: root
+    group: root
+    mode: "0644"
   loop: "{{ mylab_ipam.vms }}"
   loop_control:
     label: "{{ item.name }}"
   notify: reload systemd
 
+- name: Flush handlers before starting VMs
+  ansible.builtin.meta: flush_handlers
+
 - name: Enable and start VMs
   ansible.builtin.systemd:
     name: "mylab-vm@{{ item.name }}.service"
     enabled: true
-    state: started
+    state: restarted
   loop: "{{ mylab_ipam.vms }}"
   loop_control:
     label: "{{ item.name }}"
