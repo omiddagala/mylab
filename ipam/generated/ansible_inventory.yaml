@@ -4,93 +4,34 @@ all:
       hosts:
         bastion1.dc1.lab:
           ansible_host: 10.10.10.10
-          role: bastion
-          dc: dc1
-          vlan: management
         prod1-cp1.dc1.lab:
           ansible_host: 10.10.20.11
-          role: k8s-control-plane
-          dc: dc1
-          cluster: prod1
-          vlan: prod1
         prod1-w1.dc1.lab:
           ansible_host: 10.10.20.21
-          role: k8s-worker
-          dc: dc1
-          cluster: prod1
-          vlan: prod1
         prod1-w2.dc1.lab:
           ansible_host: 10.10.20.22
-          role: k8s-worker
-          dc: dc1
-          cluster: prod1
-          vlan: prod1
         leaf1-dc1.lab:
           ansible_host: 10.10.50.11
-          role: leaf
-          dc: dc1
-          loopback: 10.255.0.11
-          vlan: infra
         leaf2-dc1.lab:
           ansible_host: 10.10.50.12
-          role: leaf
-          dc: dc1
-          loopback: 10.255.0.12
-          vlan: infra
         r1-dc1.lab:
           ansible_host: 10.10.50.1
-          role: router
-          dc: dc1
-          loopback: 10.255.0.1
-          vlan: infra
         r2-dc1.lab:
           ansible_host: 10.10.50.2
-          role: router
-          dc: dc1
-          loopback: 10.255.0.2
-          vlan: infra
         prod2-cp1.dc2.lab:
           ansible_host: 10.20.20.11
-          role: k8s-control-plane
-          dc: dc2
-          cluster: prod2
-          vlan: prod2
         prod2-w1.dc2.lab:
           ansible_host: 10.20.20.21
-          role: k8s-worker
-          dc: dc2
-          cluster: prod2
-          vlan: prod2
         prod2-w2.dc2.lab:
           ansible_host: 10.20.20.22
-          role: k8s-worker
-          dc: dc2
-          cluster: prod2
-          vlan: prod2
         leaf1-dc2.lab:
           ansible_host: 10.20.50.11
-          role: leaf
-          dc: dc2
-          loopback: 10.255.0.31
-          vlan: infra
         leaf2-dc2.lab:
           ansible_host: 10.20.50.12
-          role: leaf
-          dc: dc2
-          loopback: 10.255.0.32
-          vlan: infra
         r1-dc2.lab:
           ansible_host: 10.20.50.1
-          role: router
-          dc: dc2
-          loopback: 10.255.0.21
-          vlan: infra
         r2-dc2.lab:
           ansible_host: 10.20.50.2
-          role: router
-          dc: dc2
-          loopback: 10.255.0.22
-          vlan: infra
     bastion:
       hosts:
         bastion1.dc1.lab:
@@ -115,40 +56,24 @@ all:
           ansible_host: 10.20.50.11
         leaf2-dc2.lab:
           ansible_host: 10.20.50.12
-    k8s_prod1:
-      hosts:
-        prod1-cp1.dc1.lab:
-          ansible_host: 10.10.20.11
-        prod1-w1.dc1.lab:
-          ansible_host: 10.10.20.21
-        prod1-w2.dc1.lab:
-          ansible_host: 10.10.20.22
-    k8s_dev:
-      hosts: {}
-    k8s_prod2:
-      hosts:
-        prod2-cp1.dc2.lab:
-          ansible_host: 10.20.20.11
-        prod2-w1.dc2.lab:
-          ansible_host: 10.20.20.21
-        prod2-w2.dc2.lab:
-          ansible_host: 10.20.20.22
-    k8s_control_plane:
-      hosts:
-        prod1-cp1.dc1.lab:
-          ansible_host: 10.10.20.11
-        prod2-cp1.dc2.lab:
-          ansible_host: 10.20.20.11
-    k8s_workers:
-      hosts:
-        prod1-w1.dc1.lab:
-          ansible_host: 10.10.20.21
-        prod1-w2.dc1.lab:
-          ansible_host: 10.10.20.22
-        prod2-w1.dc2.lab:
-          ansible_host: 10.20.20.21
-        prod2-w2.dc2.lab:
-          ansible_host: 10.20.20.22
+    kubernetes:
+      children:
+        kube_control_plane:
+          hosts:
+            prod1-cp1.dc1.lab:
+              ansible_host: 10.10.20.11
+            prod2-cp1.dc2.lab:
+              ansible_host: 10.20.20.11
+        kube_workers:
+          hosts:
+            prod1-w1.dc1.lab:
+              ansible_host: 10.10.20.21
+            prod1-w2.dc1.lab:
+              ansible_host: 10.10.20.22
+            prod2-w1.dc2.lab:
+              ansible_host: 10.20.20.21
+            prod2-w2.dc2.lab:
+              ansible_host: 10.20.20.22
     dc1:
       hosts:
         bastion1.dc1.lab:
