@@ -29,3 +29,24 @@ mylab_default_disk_gb: 20
 mylab_default_username: debian
 mylab_ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIHe3ys785Q0MwXnuHzZA8oHHTr/4+VqvowuoZErIcEz omid@thismachine"
 mylab_ipam_vm_file: "{{ playbook_dir }}/../../ipam/generated/hypervisor-vms.yaml"
+
+# Guest SSH settings for the hardening play
+mylab_guest_ansible_user: debian
+mylab_guest_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+
+# Bridges QEMU is allowed to attach to
+mylab_allowed_bridges:
+  - br-mgmt
+  - br-wan
+  - br-dc1
+  - br-dc2
+
+mylab_remove_packages:
+  - telnet
+  - rsh-client
+  - rsh-redone-client
+  - nis
+
+mylab_default_packages_extra: []
+
+mylab_qemu_bridge_helper_path: /usr/lib/qemu/qemu-bridge-helper

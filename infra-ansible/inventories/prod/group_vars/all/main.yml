@@ -8,11 +8,14 @@ ansible_become: true
 ansible_python_interpreter: /usr/bin/python3
 ansible_ssh_private_key_file: ~/.ssh/mylab
 ansible_ssh_common_args: >-
-  -o ProxyJump=automation@bastion1.dc1.lab
   -o PreferredAuthentications=publickey
+  -o IdentitiesOnly=yes
   -o StrictHostKeyChecking=no
+  -o UserKnownHostsFile=/dev/null
 
+mylab_bastion_host: 192.168.50.10
 mylab_admin_group: adminops
+
 mylab_admin_users:
   - name: automation
     shell: /bin/bash
@@ -31,12 +34,11 @@ mylab_ssh_allow_tcp_forwarding: false
 mylab_ssh_allow_agent_forwarding: false
 
 mylab_manage_firewall: true
-
 mylab_operator_ssh_cidrs:
-  - 198.51.100.10/32
-
+  - 192.168.50.0/24
 mylab_allowed_ssh_sources:
-  - 10.10.10.10/32
+  - 192.168.50.10/32
+  - 192.168.50.0/24
 
 mylab_dns_servers:
   - 1.1.1.1
@@ -68,6 +70,7 @@ mylab_apt_common_packages:
   - ncdu
   - net-tools
   - nftables
+  - openssh-server
   - rsync
   - socat
   - sudo
@@ -120,7 +123,7 @@ mylab_kubernetes_sysctl:
   net.bridge.bridge-nf-call-ip6tables: 1
   net.ipv4.ip_forward: 1
 
-mylab_management_subnet: 10.10.10.0/24
+mylab_management_subnet: 192.168.50.0/24
 
 mylab_vlan_definitions:
   - { id: 10, name: management }
