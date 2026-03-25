@@ -11,7 +11,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
   loop:
     - "{{ mylab_root_dir }}"
     - "{{ mylab_images_dir }}"
@@ -21,16 +21,42 @@
     - "{{ mylab_logs_dir }}"
     - "{{ mylab_scripts_dir }}"
 
+- name: Ensure /etc/qemu exists
+  ansible.builtin.file:
+    path: /etc/qemu
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure QEMU bridge helper ACL
+  ansible.builtin.copy:
+    dest: /etc/qemu/bridge.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      {% for bridge in mylab_allowed_bridges %}
+      allow {{ bridge }}
+      {% endfor %}
+
+- name: Ensure QEMU bridge helper is setuid root
+  ansible.builtin.file:
+    path: "{{ mylab_qemu_bridge_helper_path }}"
+    owner: root
+    group: root
+    mode: "4755"
+
 - name: Render bridge helper script
   ansible.builtin.template:
     src: setup-bridges.sh.j2
     dest: /usr/local/sbin/mylab-setup-bridges.sh
-    mode: '0755'
+    mode: "0755"
 
 - name: Render systemd unit for host bridges
   ansible.builtin.copy:
     dest: "{{ mylab_systemd_dir }}/mylab-bridges.service"
-    mode: '0644'
+    mode: "0644"
     content: |
       [Unit]
       Description=Create mylab Linux bridges
@@ -49,7 +75,7 @@
 - name: Enable IPv4 forwarding for routed lab uplinks
   ansible.posix.sysctl:
     name: net.ipv4.ip_forward
-    value: '1'
+    value: "1"
     state: present
     sysctl_set: true
     reload: true
@@ -58,7 +84,7 @@
   ansible.builtin.template:
     src: nftables-mylab.conf.j2
     dest: /etc/nftables.conf
-    mode: '0644'
+    mode: "0644"
   notify: restart nftables
 
 - name: Enable bridge setup service
@@ -71,10 +97,37 @@
   ansible.builtin.get_url:
     url: "{{ mylab_cloud_image_url }}"
     dest: "{{ mylab_images_dir }}/{{ mylab_cloud_image_name }}"
-    mode: '0644'
+    mode: "0644"
 
 - name: Enable nftables
   ansible.builtin.systemd:
     name: nftables
     enabled: true
     state: started
+
+- name: Ensure /etc/qemu exists
+  ansible.builtin.file:
+    path: /etc/qemu
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure QEMU bridge helper ACL
+  ansible.builtin.copy:
+    dest: /etc/qemu/bridge.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      allow br-mgmt
+      allow br-wan
+      allow br-dc1
+      allow br-dc2
+
+- name: Ensure QEMU bridge helper is setuid root
+  ansible.builtin.file:
+    path: /usr/lib/qemu/qemu-bridge-helper
+    owner: root
+    group: root
+    mode: "4755"

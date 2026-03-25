@@ -1,20 +1,42 @@
 #cloud-config
+preserve_hostname: false
 hostname: {{ item.name.split('.')[0] }}
 fqdn: {{ item.name }}
-manage_etc_hosts: true
 
 users:
+  - default
   - name: {{ mylab_default_username }}
     sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo,adm
     shell: /bin/bash
     ssh_authorized_keys:
-      - {{ mylab_ssh_public_key }}
+      - "{{ mylab_ssh_public_key }}"
+
+ssh_pwauth: false
+disable_root: true
 
 package_update: true
+package_upgrade: false
+
 packages:
   - qemu-guest-agent
+  - openssh-server
   - curl
-  - python3
+  - vim
+  - git
+  - net-tools
+
+write_files:
+  - path: /etc/systemd/system/serial-getty@ttyS0.service.d/override.conf
+    permissions: "0644"
+    content: |
+      [Service]
+      ExecStart=
+      ExecStart=-/sbin/agetty -o '-p -- \\u' --keep-baud 115200,38400,9600 ttyS0 vt220
 
 runcmd:
-  - [ systemctl, enable, --now, qemu-guest-agent ]
+  - systemctl daemon-reload
+  - systemctl enable ssh
+  - systemctl restart ssh
+  - systemctl enable qemu-guest-agent
+  - systemctl restart qemu-guest-agent

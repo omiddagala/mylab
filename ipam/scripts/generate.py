@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 import yaml
 
-
 ROOT = Path(__file__).resolve().parent.parent
 GENERATED_DIR = ROOT / "generated"
 
@@ -67,40 +66,9 @@ def load_globals() -> Dict[str, Any]:
 
 
 def role_matches(role: str, expected: str) -> bool:
-    return role.strip().lower() == expected.strip().lower()
-
-
-def get_hosts_by_role(
-    hosts: Dict[str, Dict[str, Any]],
-    *roles: str,
-) -> List[Tuple[str, Dict[str, Any]]]:
-    wanted = {r.lower() for r in roles}
-    result = []
-    for hostname, meta in hosts.items():
-        role = str(meta.get("role", "")).lower()
-        if role in wanted:
-            result.append((hostname, meta))
-    return sorted(result, key=fqdn_sort_key)
-
-
-def get_hosts_by_cluster(
-    hosts: Dict[str, Dict[str, Any]],
-    cluster_name: str,
-) -> List[Tuple[str, Dict[str, Any]]]:
-    result = []
-    for hostname, meta in hosts.items():
-        if str(meta.get("cluster", "")) == cluster_name:
-            result.append((hostname, meta))
-    return sorted(result, key=fqdn_sort_key)
-
-
-def unique_clusters(hosts: Dict[str, Dict[str, Any]]) -> List[str]:
-    clusters = set()
-    for meta in hosts.values():
-        cluster = meta.get("cluster")
-        if cluster:
-            clusters.add(str(cluster))
-    return sorted(clusters)
+    left = role.strip().lower().replace("_", "-")
+    right = expected.strip().lower().replace("_", "-")
+    return left == right
 
 
 def build_ansible_inventory(hosts: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
@@ -111,11 +79,7 @@ def build_ansible_inventory(hosts: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
                 "bastion": {"hosts": {}},
                 "routers": {"hosts": {}},
                 "leafs": {"hosts": {}},
-                "k8s_prod1": {"hosts": {}},
-                "k8s_dev": {"hosts": {}},
-                "k8s_prod2": {"hosts": {}},
-                "k8s_control_plane": {"hosts": {}},
-                "k8s_workers": {"hosts": {}},
+                "kubernetes": {"children": {"kube_control_plane": {"hosts": {}}, "kube_workers": {"hosts": {}}}},
                 "dc1": {"hosts": {}},
                 "dc2": {"hosts": {}},
             }
@@ -125,25 +89,11 @@ def build_ansible_inventory(hosts: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     children = inventory["all"]["children"]
 
     for hostname, meta in sorted(hosts.items(), key=fqdn_sort_key):
-        ip = meta["ip"]
+        ip = str(meta["ip"])
         role = str(meta.get("role", ""))
         dc = str(meta.get("dc", ""))
 
-        hostvars: Dict[str, Any] = {
-            "ansible_host": ip,
-            "role": role,
-        }
-
-        if dc:
-            hostvars["dc"] = dc
-        if "cluster" in meta:
-            hostvars["cluster"] = meta["cluster"]
-        if "loopback" in meta:
-            hostvars["loopback"] = meta["loopback"]
-        if "vlan" in meta:
-            hostvars["vlan"] = meta["vlan"]
-
-        children["linux"]["hosts"][hostname] = hostvars
+        children["linux"]["hosts"][hostname] = {"ansible_host": ip}
 
         if role_matches(role, "bastion"):
             children["bastion"]["hosts"][hostname] = {"ansible_host": ip}
@@ -151,24 +101,10 @@ def build_ansible_inventory(hosts: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
             children["routers"]["hosts"][hostname] = {"ansible_host": ip}
         elif role_matches(role, "leaf"):
             children["leafs"]["hosts"][hostname] = {"ansible_host": ip}
-        elif role_matches(role, "k8s-master"):
-            cluster = str(meta.get("cluster", ""))
-            if cluster == "prod1":
-                children["k8s_prod1"]["hosts"][hostname] = {"ansible_host": ip}
-            elif cluster == "dev":
-                children["k8s_dev"]["hosts"][hostname] = {"ansible_host": ip}
-            elif cluster == "prod2":
-                children["k8s_prod2"]["hosts"][hostname] = {"ansible_host": ip}
-            children["k8s_control_plane"]["hosts"][hostname] = {"ansible_host": ip}
+        elif role_matches(role, "k8s-control-plane"):
+            children["kubernetes"]["children"]["kube_control_plane"]["hosts"][hostname] = {"ansible_host": ip}
         elif role_matches(role, "k8s-worker"):
-            cluster = str(meta.get("cluster", ""))
-            if cluster == "prod1":
-                children["k8s_prod1"]["hosts"][hostname] = {"ansible_host": ip}
-            elif cluster == "dev":
-                children["k8s_dev"]["hosts"][hostname] = {"ansible_host": ip}
-            elif cluster == "prod2":
-                children["k8s_prod2"]["hosts"][hostname] = {"ansible_host": ip}
-            children["k8s_workers"]["hosts"][hostname] = {"ansible_host": ip}
+            children["kubernetes"]["children"]["kube_workers"]["hosts"][hostname] = {"ansible_host": ip}
 
         if dc == "dc1":
             children["dc1"]["hosts"][hostname] = {"ansible_host": ip}
@@ -181,90 +117,207 @@ def build_ansible_inventory(hosts: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
 def build_kubespray_inventory(hosts: Dict[str, Dict[str, Any]]) -> str:
     cp_hosts: List[str] = []
     worker_hosts: List[str] = []
-    cluster_map: Dict[str, List[str]] = {
-        "prod1": [],
-        "dev": [],
-        "prod2": [],
-    }
 
-    lines: List[str] = []
-    lines.append("[all]")
-    lines.append("")
+    lines: List[str] = ["[all]"]
 
     for hostname, meta in sorted(hosts.items(), key=fqdn_sort_key):
         role = str(meta.get("role", ""))
-        cluster = str(meta.get("cluster", ""))
         ip = str(meta["ip"])
+        if role_matches(role, "k8s-control-plane") or role_matches(role, "k8s-worker"):
+            lines.append(f"{hostname} ansible_host={ip}")
+            if role_matches(role, "k8s-control-plane"):
+                cp_hosts.append(hostname)
+            else:
+                worker_hosts.append(hostname)
 
-        if role not in {"k8s-master", "k8s-worker"}:
-            continue
-
-        lines.append(f"{hostname} ansible_host={ip}")
-
-        if role == "k8s-master":
-            cp_hosts.append(hostname)
-        if role == "k8s-worker":
-            worker_hosts.append(hostname)
-
-        if cluster in cluster_map:
-            cluster_map[cluster].append(hostname)
-
-    lines.append("")
-    lines.append("[kube_control_plane]")
-    for hostname in cp_hosts:
-        lines.append(hostname)
-
-    lines.append("")
-    lines.append("[etcd]")
-    for hostname in cp_hosts:
-        lines.append(hostname)
-
-    lines.append("")
-    lines.append("[kube_node]")
-    for hostname in worker_hosts:
-        lines.append(hostname)
-
-    lines.append("")
-    lines.append("[calico_rr]")
-    lines.append("")
-
-    for cluster_name in ["prod1", "dev", "prod2"]:
-        lines.append(f"[{cluster_name}]")
-        for hostname in cluster_map[cluster_name]:
-            lines.append(hostname)
-        lines.append("")
-
-    lines.append("[k8s_cluster:children]")
-    lines.append("prod1")
-    lines.append("dev")
-    lines.append("prod2")
-    lines.append("")
-
-    return "\n".join(lines).rstrip() + "\n"
+    lines += ["", "[kube_control_plane]"] + cp_hosts
+    lines += ["", "[etcd]"] + cp_hosts
+    lines += ["", "[kube_node]"] + worker_hosts
+    lines += ["", "[calico_rr]", "", "[k8s_cluster:children]", "kube_control_plane", "kube_node", ""]
+    return "\n".join(lines)
 
 
 def build_dns_records(hosts: Dict[str, Dict[str, Any]], globals_cfg: Dict[str, Any]) -> Dict[str, Any]:
     domain = str(globals_cfg.get("lab_domain", "lab"))
-
     records: Dict[str, str] = {}
     ptr_records: Dict[str, str] = {}
 
     for hostname, meta in sorted(hosts.items(), key=fqdn_sort_key):
         ip = str(meta["ip"])
         records[hostname] = ip
-
         short = hostname.split(".")[0]
-        fqdn_suffix = "." + domain
-        if hostname.endswith(fqdn_suffix):
+        if hostname.endswith("." + domain):
             records[short] = ip
+        ptr_records[".".join(reversed(ip.split("."))) + ".in-addr.arpa"] = hostname
 
-        reversed_ip = ".".join(reversed(ip.split("."))) + ".in-addr.arpa"
-        ptr_records[reversed_ip] = hostname
+    return {"a_records": records, "ptr_records": ptr_records}
 
-    return {
-        "a_records": records,
-        "ptr_records": ptr_records,
-    }
+
+def role_vm_size(role: str) -> Dict[str, int]:
+    if role_matches(role, "bastion"):
+        return {"vcpu": 2, "memory_mb": 2048, "disk_gb": 20}
+    if role_matches(role, "router"):
+        return {"vcpu": 2, "memory_mb": 2048, "disk_gb": 16}
+    if role_matches(role, "leaf"):
+        return {"vcpu": 2, "memory_mb": 1536, "disk_gb": 12}
+    if role_matches(role, "k8s-control-plane"):
+        return {"vcpu": 2, "memory_mb": 4096, "disk_gb": 32}
+    if role_matches(role, "k8s-worker"):
+        return {"vcpu": 2, "memory_mb": 4096, "disk_gb": 40}
+    return {"vcpu": 2, "memory_mb": 2048, "disk_gb": 20}
+
+
+def nameservers() -> List[str]:
+    return ["1.1.1.1", "8.8.8.8"]
+
+
+def mac_for_ip(ip: str) -> str:
+    a, b, _, d = ip.split(".")
+    return f"52:54:00:{int(a):02x}:{int(b):02x}:{int(d):02x}"
+
+
+def mgmt_ip_for_host(meta: Dict[str, Any]) -> str:
+    dc = str(meta.get("dc", ""))
+    role = str(meta.get("role", ""))
+    ip_last = int(str(meta["ip"]).split(".")[-1])
+
+    if dc == "dc1" and role_matches(role, "bastion"):
+        return "192.168.50.10/24"
+    if dc == "dc1":
+        return f"192.168.50.{ip_last}/24"
+    if dc == "dc2":
+        return f"192.168.50.{40 + ip_last}/24"
+
+    raise ValueError(f"Cannot derive management IP for host metadata: {meta}")
+
+
+def gateway_for_vlan(meta: Dict[str, Any]) -> str:
+    dc = str(meta.get("dc", ""))
+    vlan = str(meta.get("vlan", ""))
+
+    if dc == "dc1" and vlan == "management":
+        return "192.168.50.254"
+    if dc == "dc1" and vlan == "infra":
+        return "10.10.50.254"
+    if dc == "dc1" and vlan == "prod1":
+        return "10.10.20.254"
+
+    if dc == "dc2" and vlan == "infra":
+        return "10.20.50.254"
+    if dc == "dc2" and vlan == "prod2":
+        return "10.20.20.254"
+
+    raise ValueError(f"Cannot derive gateway for host metadata: {meta}")
+
+
+def wan_ip_for_router(meta: Dict[str, Any]) -> str:
+    hostname = str(meta.get("hostname", ""))
+    dc = str(meta.get("dc", ""))
+    ip = str(meta["ip"])
+
+    if dc == "dc1" and ip.endswith(".1"):
+        return "172.16.255.11/24"
+    if dc == "dc1" and ip.endswith(".2"):
+        return "172.16.255.12/24"
+    if dc == "dc2" and ip.endswith(".1"):
+        return "172.16.255.21/24"
+    if dc == "dc2" and ip.endswith(".2"):
+        return "172.16.255.22/24"
+    raise ValueError(f"Cannot derive WAN IP for router {hostname or meta}")
+
+
+def build_hypervisor_vms(hosts: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    vms: List[Dict[str, Any]] = []
+
+    for hostname, meta in sorted(hosts.items(), key=fqdn_sort_key):
+        role = str(meta.get("role", ""))
+        dc = str(meta.get("dc", ""))
+        host_ip = str(meta["ip"])
+        size = role_vm_size(role)
+
+        vm: Dict[str, Any] = {
+            "name": hostname,
+            "role": role.replace("-", "_"),
+            "dc": dc,
+            "vcpu": size["vcpu"],
+            "memory_mb": size["memory_mb"],
+            "disk_gb": size["disk_gb"],
+            "networks": [],
+        }
+
+        if role_matches(role, "bastion"):
+            vm["networks"].append(
+                {
+                    "bridge": "br-mgmt",
+                    "ip": mgmt_ip_for_host(meta),
+                    "gateway": gateway_for_vlan({"dc": "dc1", "vlan": "management"}),
+                    "nameservers": nameservers(),
+                    "mac": "52:54:00:10:50:10",
+                }
+            )
+
+        elif role_matches(role, "router"):
+            vm["networks"].append(
+                {
+                    "bridge": "br-dc1" if dc == "dc1" else "br-dc2",
+                    "ip": f"{host_ip}/24",
+                    "mac": mac_for_ip(host_ip),
+                }
+            )
+            vm["networks"].append(
+                {
+                    "bridge": "br-mgmt",
+                    "ip": mgmt_ip_for_host(meta),
+                    "mac": mac_for_ip(mgmt_ip_for_host(meta).split("/")[0]),
+                }
+            )
+            vm["networks"].append(
+                {
+                    "bridge": "br-wan",
+                    "ip": wan_ip_for_router({"dc": dc, "ip": host_ip, "hostname": hostname}),
+                    "gateway": "172.16.255.1",
+                    "nameservers": nameservers(),
+                    "mac": mac_for_ip(wan_ip_for_router({"dc": dc, "ip": host_ip, "hostname": hostname}).split("/")[0]),
+                }
+            )
+
+        elif role_matches(role, "leaf"):
+            vm["networks"].append(
+                {
+                    "bridge": "br-dc1" if dc == "dc1" else "br-dc2",
+                    "ip": f"{host_ip}/24",
+                    "gateway": gateway_for_vlan(meta),
+                    "nameservers": nameservers(),
+                    "mac": mac_for_ip(host_ip),
+                }
+            )
+
+        elif role_matches(role, "k8s-control-plane") or role_matches(role, "k8s-worker"):
+            vm["networks"].append(
+                {
+                    "bridge": "br-dc1" if dc == "dc1" else "br-dc2",
+                    "ip": f"{host_ip}/24",
+                    "gateway": gateway_for_vlan(meta),
+                    "nameservers": nameservers(),
+                    "mac": mac_for_ip(host_ip),
+                }
+            )
+            vm["networks"].append(
+                {
+                    "bridge": "br-mgmt",
+                    "ip": mgmt_ip_for_host(meta),
+                    "gateway": gateway_for_vlan({"dc": "dc1", "vlan": "management"}),
+                    "nameservers": nameservers(),
+                    "mac": mac_for_ip(mgmt_ip_for_host(meta).split("/")[0]),
+                }
+            )
+
+        else:
+            raise ValueError(f"Unsupported role for hypervisor VM generation: {role}")
+
+        vms.append(vm)
+
+    return {"vms": vms}
 
 
 def write_kubespray_inventory(content: str, path: Path) -> None:
@@ -275,24 +328,20 @@ def write_kubespray_inventory(content: str, path: Path) -> None:
 def main() -> int:
     try:
         ensure_generated_dir()
-
         hosts = load_hosts()
         globals_cfg = load_globals()
 
-        ansible_inventory = build_ansible_inventory(hosts)
-        kubespray_inventory = build_kubespray_inventory(hosts)
-        dns_records = build_dns_records(hosts, globals_cfg)
-
-        dump_yaml(ansible_inventory, GENERATED_DIR / "ansible_inventory.yaml")
-        write_kubespray_inventory(kubespray_inventory, GENERATED_DIR / "kubespray_inventory.ini")
-        dump_yaml(dns_records, GENERATED_DIR / "dns_records.yaml")
+        dump_yaml(build_ansible_inventory(hosts), GENERATED_DIR / "ansible_inventory.yaml")
+        write_kubespray_inventory(build_kubespray_inventory(hosts), GENERATED_DIR / "kubespray_inventory.ini")
+        dump_yaml(build_dns_records(hosts, globals_cfg), GENERATED_DIR / "dns_records.yaml")
+        dump_yaml(build_hypervisor_vms(hosts), GENERATED_DIR / "hypervisor-vms.yaml")
 
         print("Generated files:")
         print(f"  - {GENERATED_DIR / 'ansible_inventory.yaml'}")
         print(f"  - {GENERATED_DIR / 'kubespray_inventory.ini'}")
         print(f"  - {GENERATED_DIR / 'dns_records.yaml'}")
+        print(f"  - {GENERATED_DIR / 'hypervisor-vms.yaml'}")
         return 0
-
     except Exception as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1

@@ -1,0 +1,33 @@
+global_defs {
+  router_id {{ inventory_hostname }}
+}
+
+vrrp_instance VI_MGMT {
+  state {{ 'MASTER' if vrrp_priority_mgmt | int > 150 else 'BACKUP' }}
+  interface eth1
+  virtual_router_id 50
+  priority {{ vrrp_priority_mgmt }}
+  advert_int 1
+  authentication {
+    auth_type PASS
+    auth_pass {{ mylab_vrrp_auth_pass }}
+  }
+  virtual_ipaddress {
+    {{ mylab_vrrp_mgmt_vip }}/24
+  }
+}
+
+vrrp_instance VI_INFRA {
+  state {{ 'MASTER' if vrrp_priority_infra | int > 150 else 'BACKUP' }}
+  interface eth0
+  virtual_router_id {{ 51 if router_dc == 'dc1' else 52 }}
+  priority {{ vrrp_priority_infra }}
+  advert_int 1
+  authentication {
+    auth_type PASS
+    auth_pass {{ mylab_vrrp_auth_pass }}
+  }
+  virtual_ipaddress {
+    {{ mylab_vrrp_dc1_infra_vip if router_dc == 'dc1' else mylab_vrrp_dc2_infra_vip }}/24
+  }
+}

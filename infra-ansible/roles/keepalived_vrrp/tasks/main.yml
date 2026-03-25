@@ -1,0 +1,29 @@
+---
+- name: Install keepalived
+  ansible.builtin.apt:
+    name: "{{ keepalived_packages }}"
+    state: present
+    update_cache: true
+
+- name: Enable IPv4 forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    sysctl_set: true
+    reload: true
+
+- name: Render keepalived config
+  ansible.builtin.template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart keepalived
+
+- name: Enable keepalived
+  ansible.builtin.service:
+    name: keepalived
+    state: started
+    enabled: true

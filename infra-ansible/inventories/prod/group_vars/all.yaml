@@ -1,0 +1,24 @@
+---
+mylab_timezone: Europe/Amsterdam
+
+mylab_dns_servers:
+  - 1.1.1.1
+  - 8.8.8.8
+
+mylab_vrrp_auth_pass: mylabvrrp
+mylab_vrrp_mgmt_vip: 192.168.50.254
+mylab_vrrp_dc1_infra_vip: 10.10.50.254
+mylab_vrrp_dc2_infra_vip: 10.20.50.254
+
+mylab_nat_allowed_sources:
+  - 10.10.20.0/24
+  - 10.20.20.0/24
+  - 192.168.50.0/24
+
+mylab_inter_dc_enable_ospf: true
+mylab_inter_dc_enable_bgp: false
+
+mylab_bgp_asn_dc1: 65101
+mylab_bgp_asn_dc2: 65102
+mylab_bgp_rr_loopback_dc1: 10.255.0.1
+mylab_bgp_rr_loopback_dc2: 10.255.0.21

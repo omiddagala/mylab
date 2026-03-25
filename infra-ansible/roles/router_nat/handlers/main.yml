@@ -1,5 +1,5 @@
 ---
-- name: restart frr
+- name: restart nftables
   ansible.builtin.service:
-    name: frr
+    name: nftables
     state: restarted

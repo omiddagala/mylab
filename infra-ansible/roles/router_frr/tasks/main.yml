@@ -5,39 +5,45 @@
       - frr
       - frr-pythontools
     state: present
+    update_cache: true
 
-- name: Configure router interfaces
-  ansible.builtin.template:
-    src: interfaces-router.j2
-    dest: /etc/network/interfaces.d/mylab-router.cfg
-    mode: '0644'
-  notify: Restart networking
-
-- name: Configure FRR daemons
+- name: Enable FRR daemons
   ansible.builtin.copy:
     dest: /etc/frr/daemons
-    mode: '0644'
-    content: |
-      zebra={{ router_frr_manage_daemons.zebra }}
-      bgpd={{ router_frr_manage_daemons.bgpd }}
-      ospfd={{ router_frr_manage_daemons.ospfd }}
-      staticd={{ router_frr_manage_daemons.staticd }}
-  notify: Restart frr
-
-- name: Configure FRR router config
-  ansible.builtin.template:
-    src: frr-router.conf.j2
-    dest: /etc/frr/frr.conf
-    mode: '0640'
     owner: frr
     group: frr
-  notify: Restart frr
+    mode: "0640"
+    content: |
+      zebra=yes
+      bgpd={{ 'yes' if mylab_inter_dc_enable_bgp else 'no' }}
+      ospfd=yes
+      ospf6d=no
+      ripd=no
+      ripngd=no
+      isisd=no
+      pimd=no
+      ldpd=no
+      nhrpd=no
+      eigrpd=no
+      babeld=no
+      sharpd=no
+      pbrd=no
+      bfdd=no
+      fabricd=no
+      vrrpd=no
+  notify: restart frr
 
-- name: Ensure services enabled
+- name: Render FRR config
+  ansible.builtin.template:
+    src: frr.conf.j2
+    dest: /etc/frr/frr.conf
+    owner: frr
+    group: frr
+    mode: "0640"
+  notify: restart frr
+
+- name: Enable FRR
   ansible.builtin.service:
-    name: "{{ item }}"
-    enabled: true
+    name: frr
     state: started
-  loop:
-    - networking
-    - frr
+    enabled: true

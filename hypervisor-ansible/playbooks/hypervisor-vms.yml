@@ -2,21 +2,18 @@
 - name: Render and manage mylab VMs
   hosts: hypervisors
   become: true
-  gather_facts: true
 
   pre_tasks:
-    - name: Assert generated VM definition file exists
+    - name: Assert generated VM file exists
       ansible.builtin.stat:
         path: "{{ mylab_ipam_vm_file }}"
       register: mylab_ipam_vm_file_stat
 
-    - name: Fail when generated VM definition file is missing
+    - name: Fail if generated VM file is missing
       ansible.builtin.assert:
         that:
           - mylab_ipam_vm_file_stat.stat.exists
-        fail_msg: >-
-          VM definition file not found at {{ mylab_ipam_vm_file }}.
-          Generate it first in the ipam repo.
+        fail_msg: "Missing {{ mylab_ipam_vm_file }}"
 
   roles:
     - role: qemu_vm

@@ -26,7 +26,9 @@
   gather_facts: true
   become: true
   roles:
+    - keepalived_vrrp
     - router_frr
+    - router_nat
 
 - name: Configure leafs
   hosts: leafs

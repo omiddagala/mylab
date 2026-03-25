@@ -1,44 +1,8 @@
 ---
-- name: Install FRR and vlan packages
+- name: Ensure base routing tools are installed
   ansible.builtin.apt:
     name:
-      - frr
-      - vlan
-      - bridge-utils
+      - iproute2
+      - traceroute
     state: present
-
-- name: Configure leaf interfaces
-  ansible.builtin.template:
-    src: interfaces-leaf.j2
-    dest: /etc/network/interfaces.d/mylab-leaf.cfg
-    mode: '0644'
-  notify: Restart networking
-
-- name: Configure FRR daemons
-  ansible.builtin.copy:
-    dest: /etc/frr/daemons
-    mode: '0644'
-    content: |
-      zebra={{ leaf_frr_manage_daemons.zebra }}
-      bgpd={{ leaf_frr_manage_daemons.bgpd }}
-      ospfd={{ leaf_frr_manage_daemons.ospfd }}
-      staticd={{ leaf_frr_manage_daemons.staticd }}
-  notify: Restart frr
-
-- name: Configure FRR leaf config
-  ansible.builtin.template:
-    src: frr-leaf.conf.j2
-    dest: /etc/frr/frr.conf
-    mode: '0640'
-    owner: frr
-    group: frr
-  notify: Restart frr
-
-- name: Ensure services enabled
-  ansible.builtin.service:
-    name: "{{ item }}"
-    enabled: true
-    state: started
-  loop:
-    - networking
-    - frr
+    update_cache: true

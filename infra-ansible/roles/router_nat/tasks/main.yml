@@ -1,0 +1,16 @@
+---
+- name: Render router nftables NAT rules
+  ansible.builtin.template:
+    src: router-nat.nft.j2
+    dest: /etc/nftables-router.nat.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart nftables
+
+- name: Ensure nftables includes router NAT rules
+  ansible.builtin.lineinfile:
+    path: /etc/nftables.conf
+    line: 'include "/etc/nftables-router.nat.conf"'
+    state: present
+  notify: restart nftables

@@ -1,21 +1,24 @@
 version: 2
 ethernets:
 {% for nic in item.networks %}
-  eth{{ loop.index0 }}:
+  nic{{ loop.index0 }}:
+    match:
+      macaddress: "{{ nic.mac | lower }}"
+    set-name: "eth{{ loop.index0 }}"
     dhcp4: false
     dhcp6: false
     addresses:
-      - {{ nic.ip }}
+      - "{{ nic.ip }}"
 {% if nic.gateway is defined %}
     routes:
       - to: default
-        via: {{ nic.gateway }}
+        via: "{{ nic.gateway }}"
 {% endif %}
-{% if nic.nameservers is defined %}
+{% if nic.nameservers is defined and nic.nameservers | length > 0 %}
     nameservers:
       addresses:
 {% for ns in nic.nameservers %}
-        - {{ ns }}
+        - "{{ ns }}"
 {% endfor %}
 {% endif %}
 {% endfor %}

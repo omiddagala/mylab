@@ -1,18 +1,16 @@
 ---
-# Host bridge settings
 mylab_upstream_mode: routed
 mylab_uplink_interface: wlp0s20f3
+
 mylab_mgmt_bridge_cidr: 192.168.50.1/24
 mylab_wan_bridge_cidr: 172.16.255.1/24
-mylab_dc1_bridge_cidr: 10.10.10.1/24
-mylab_dc2_bridge_cidr: 10.20.20.1/24
-mylab_vm_gateway: 192.168.50.1
-mylab_wan_gateway: 172.16.255.1
+mylab_dc1_bridge_cidr: 10.10.50.254/24
+mylab_dc2_bridge_cidr: 10.20.50.254/24
+
 mylab_dns_servers:
   - 1.1.1.1
   - 8.8.8.8
 
-# Paths
 mylab_root_dir: /var/lib/mylab
 mylab_images_dir: "{{ mylab_root_dir }}/images"
 mylab_disks_dir: "{{ mylab_root_dir }}/disks"
@@ -21,8 +19,10 @@ mylab_runtime_dir: "{{ mylab_root_dir }}/runtime"
 mylab_logs_dir: "{{ mylab_root_dir }}/logs"
 mylab_scripts_dir: /usr/local/libexec/mylab
 mylab_systemd_dir: /etc/systemd/system
+
 mylab_cloud_image_url: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2
 mylab_cloud_image_name: debian-12-genericcloud-amd64.qcow2
+
 mylab_default_vcpu: 2
 mylab_default_memory_mb: 2048
 mylab_default_disk_gb: 20
