@@ -2,11 +2,10 @@
 mylab_upstream_mode: routed
 mylab_uplink_interface: wlp0s20f3
 
-# Host-side bridge IPs. Keep them unique and never reuse them on guests.
-mylab_mgmt_bridge_cidr: 192.168.50.253/24
+mylab_mgmt_bridge_cidr: 192.168.50.254/24
 mylab_wan_bridge_cidr: 172.16.255.1/24
-mylab_dc1_bridge_cidr: 10.10.50.253/24
-mylab_dc2_bridge_cidr: 10.20.50.253/24
+mylab_dc1_bridge_cidr: 10.10.50.254/24
+mylab_dc2_bridge_cidr: 10.20.50.254/24
 
 mylab_dns_servers:
   - 1.1.1.1
@@ -29,16 +28,17 @@ mylab_default_memory_mb: 2048
 mylab_default_disk_gb: 20
 mylab_default_username: debian
 
-mylab_ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIHe3ys785Q0MwXnuHzZA8oHHTr/4+VqvowuoZErIcEz omid@thismachine"
+# Controller-side SSH material used for cloud-init and later Ansible access.
+# Change these two paths if your key pair has a different name.
+mylab_ssh_public_key_file: "{{ lookup('env', 'HOME') + '/.ssh/id_ed25519.pub' }}"
+mylab_guest_ansible_private_key_file: "{{ lookup('env', 'HOME') + '/.ssh/id_ed25519' }}"
+mylab_ssh_public_key: "{{ lookup('file', mylab_ssh_public_key_file) | trim }}"
 
 mylab_ipam_vm_file: "{{ playbook_dir }}/../../ipam/generated/hypervisor-vms.yaml"
 
-# Guest SSH settings for the hardening/bootstrap play
 mylab_guest_ansible_user: debian
-mylab_guest_ansible_private_key_file: "{{ lookup('env', 'HOME') }}/.ssh/jmachine"
-mylab_guest_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+mylab_guest_ssh_common_args: "-o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
-# Bridges QEMU is allowed to attach to
 mylab_allowed_bridges:
   - br-mgmt
   - br-wan

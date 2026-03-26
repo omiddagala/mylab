@@ -6,7 +6,7 @@ exec /usr/bin/qemu-system-x86_64 \
   -enable-kvm \
   -machine q35,accel=kvm \
   -cpu host \
-  -smp {{ item.vcpus | default(mylab_default_vcpu) }} \
+  -smp {{ item.vcpu | default(item.vcpus | default(mylab_default_vcpu)) }} \
   -m {{ item.memory_mb | default(mylab_default_memory_mb) }} \
   -nographic \
   -serial file:{{ mylab_logs_dir }}/{{ item.name }}.console.log \

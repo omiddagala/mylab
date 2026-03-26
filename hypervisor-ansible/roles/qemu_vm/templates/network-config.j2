@@ -9,10 +9,11 @@ ethernets:
     dhcp6: false
     addresses:
       - "{{ nic.ip }}"
-{% if nic.gateway is defined %}
+{% if nic.default_route | default(false) and nic.gateway is defined %}
     routes:
       - to: default
         via: "{{ nic.gateway }}"
+        metric: {{ nic.route_metric | default(100 + loop.index0) }}
 {% endif %}
 {% if nic.nameservers is defined and nic.nameservers | length > 0 %}
     nameservers:
