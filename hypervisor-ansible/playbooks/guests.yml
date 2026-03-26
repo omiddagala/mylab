@@ -3,6 +3,7 @@
   hosts: hypervisors
   gather_facts: false
   become: false
+
   tasks:
     - name: Load VM definitions
       ansible.builtin.include_vars:
@@ -26,8 +27,8 @@
             | regex_replace('/.*$', '')
           }}
         ansible_user: "{{ mylab_guest_ansible_user | default(mylab_default_username) }}"
-        ansible_ssh_private_key_file: "{{ mylab_guest_ansible_private_key_file }}"
-        ansible_ssh_common_args: "{{ mylab_guest_ssh_common_args }}"
+        ansible_ssh_private_key_file: "{{ mylab_guest_ansible_private_key_file | default(lookup('env', 'HOME') ~ '/.ssh/jmachine') }}"
+        ansible_ssh_common_args: "{{ mylab_guest_ssh_common_args | default('-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null') }}"
       loop: "{{ mylab_ipam.vms }}"
       loop_control:
         label: "{{ item.name }}"
@@ -36,6 +37,7 @@
   hosts: guests
   become: true
   gather_facts: true
+
   pre_tasks:
     - name: Wait for SSH on guests
       ansible.builtin.wait_for_connection:
