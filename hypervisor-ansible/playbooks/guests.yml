@@ -26,6 +26,7 @@
             | regex_replace('/.*$', '')
           }}
         ansible_user: "{{ mylab_guest_ansible_user | default(mylab_default_username) }}"
+        ansible_ssh_private_key_file: "{{ mylab_guest_ansible_private_key_file }}"
         ansible_ssh_common_args: "{{ mylab_guest_ssh_common_args }}"
       loop: "{{ mylab_ipam.vms }}"
       loop_control:
