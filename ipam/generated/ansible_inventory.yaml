@@ -2,162 +2,199 @@ all:
   children:
     linux:
       hosts:
-        bastion1.dc1.lab: &id001
+        bastion1.dc1.lab:
           ansible_host: 192.168.50.10
           mylab_mgmt_ip: 192.168.50.10
           mylab_primary_ip: 10.10.10.10
-          vlan: management
-          role: bastion
-          dc: dc1
-        prod1-cp1.dc1.lab: &id010
-          ansible_host: 192.168.50.11
-          mylab_mgmt_ip: 192.168.50.11
-          mylab_primary_ip: 10.10.20.11
-          vlan: prod1
-          role: k8s-control-plane
-          dc: dc1
-        prod1-w1.dc1.lab: &id012
+        prod1-cp1.dc1.lab:
           ansible_host: 192.168.50.21
           mylab_mgmt_ip: 192.168.50.21
+          mylab_primary_ip: 10.10.20.11
+        prod1-w1.dc1.lab:
+          ansible_host: 192.168.50.31
+          mylab_mgmt_ip: 192.168.50.31
           mylab_primary_ip: 10.10.20.21
-          vlan: prod1
-          role: k8s-worker
-          dc: dc1
-        prod1-w2.dc1.lab: &id013
-          ansible_host: 192.168.50.22
-          mylab_mgmt_ip: 192.168.50.22
+        prod1-w2.dc1.lab:
+          ansible_host: 192.168.50.32
+          mylab_mgmt_ip: 192.168.50.32
           mylab_primary_ip: 10.10.20.22
-          vlan: prod1
-          role: k8s-worker
-          dc: dc1
-        leaf1-dc1.lab: &id006
+        leaf1-dc1.lab:
           ansible_host: 192.168.50.11
           mylab_mgmt_ip: 192.168.50.11
           mylab_primary_ip: 10.10.50.11
-          loopback: 10.255.0.11
-          vlan: infra
-          role: leaf
-          dc: dc1
-        leaf2-dc1.lab: &id007
+        leaf2-dc1.lab:
           ansible_host: 192.168.50.12
           mylab_mgmt_ip: 192.168.50.12
           mylab_primary_ip: 10.10.50.12
-          loopback: 10.255.0.12
-          vlan: infra
-          role: leaf
-          dc: dc1
-        r1-dc1.lab: &id002
+        r1-dc1.lab:
           ansible_host: 192.168.50.1
           mylab_mgmt_ip: 192.168.50.1
           mylab_primary_ip: 10.10.50.1
-          loopback: 10.255.0.1
-          vlan: infra
-          role: router
-          dc: dc1
-        r2-dc1.lab: &id003
+        r2-dc1.lab:
           ansible_host: 192.168.50.2
           mylab_mgmt_ip: 192.168.50.2
           mylab_primary_ip: 10.10.50.2
-          loopback: 10.255.0.2
-          vlan: infra
-          role: router
-          dc: dc1
-        prod2-cp1.dc2.lab: &id011
-          ansible_host: 192.168.50.51
-          mylab_mgmt_ip: 192.168.50.51
-          mylab_primary_ip: 10.20.20.11
-          vlan: prod2
-          role: k8s-control-plane
-          dc: dc2
-        prod2-w1.dc2.lab: &id014
+        prod2-cp1.dc2.lab:
           ansible_host: 192.168.50.61
           mylab_mgmt_ip: 192.168.50.61
+          mylab_primary_ip: 10.20.20.11
+        prod2-w1.dc2.lab:
+          ansible_host: 192.168.50.71
+          mylab_mgmt_ip: 192.168.50.71
           mylab_primary_ip: 10.20.20.21
-          vlan: prod2
-          role: k8s-worker
-          dc: dc2
-        prod2-w2.dc2.lab: &id015
-          ansible_host: 192.168.50.62
-          mylab_mgmt_ip: 192.168.50.62
+        prod2-w2.dc2.lab:
+          ansible_host: 192.168.50.72
+          mylab_mgmt_ip: 192.168.50.72
           mylab_primary_ip: 10.20.20.22
-          vlan: prod2
-          role: k8s-worker
-          dc: dc2
-        leaf1-dc2.lab: &id008
+        leaf1-dc2.lab:
           ansible_host: 192.168.50.51
           mylab_mgmt_ip: 192.168.50.51
           mylab_primary_ip: 10.20.50.11
-          loopback: 10.255.0.31
-          vlan: infra
-          role: leaf
-          dc: dc2
-        leaf2-dc2.lab: &id009
+        leaf2-dc2.lab:
           ansible_host: 192.168.50.52
           mylab_mgmt_ip: 192.168.50.52
           mylab_primary_ip: 10.20.50.12
-          loopback: 10.255.0.32
-          vlan: infra
-          role: leaf
-          dc: dc2
-        r1-dc2.lab: &id004
+        r1-dc2.lab:
           ansible_host: 192.168.50.41
           mylab_mgmt_ip: 192.168.50.41
           mylab_primary_ip: 10.20.50.1
-          loopback: 10.255.0.21
-          vlan: infra
-          role: router
-          dc: dc2
-        r2-dc2.lab: &id005
+        r2-dc2.lab:
           ansible_host: 192.168.50.42
           mylab_mgmt_ip: 192.168.50.42
           mylab_primary_ip: 10.20.50.2
-          loopback: 10.255.0.22
-          vlan: infra
-          role: router
-          dc: dc2
     bastion:
       hosts:
-        bastion1.dc1.lab: *id001
+        bastion1.dc1.lab:
+          ansible_host: 192.168.50.10
+          mylab_mgmt_ip: 192.168.50.10
+          mylab_primary_ip: 10.10.10.10
     routers:
       hosts:
-        r1-dc1.lab: *id002
-        r2-dc1.lab: *id003
-        r1-dc2.lab: *id004
-        r2-dc2.lab: *id005
+        r1-dc1.lab:
+          ansible_host: 192.168.50.1
+          mylab_mgmt_ip: 192.168.50.1
+          mylab_primary_ip: 10.10.50.1
+        r2-dc1.lab:
+          ansible_host: 192.168.50.2
+          mylab_mgmt_ip: 192.168.50.2
+          mylab_primary_ip: 10.10.50.2
+        r1-dc2.lab:
+          ansible_host: 192.168.50.41
+          mylab_mgmt_ip: 192.168.50.41
+          mylab_primary_ip: 10.20.50.1
+        r2-dc2.lab:
+          ansible_host: 192.168.50.42
+          mylab_mgmt_ip: 192.168.50.42
+          mylab_primary_ip: 10.20.50.2
     leafs:
       hosts:
-        leaf1-dc1.lab: *id006
-        leaf2-dc1.lab: *id007
-        leaf1-dc2.lab: *id008
-        leaf2-dc2.lab: *id009
+        leaf1-dc1.lab:
+          ansible_host: 192.168.50.11
+          mylab_mgmt_ip: 192.168.50.11
+          mylab_primary_ip: 10.10.50.11
+        leaf2-dc1.lab:
+          ansible_host: 192.168.50.12
+          mylab_mgmt_ip: 192.168.50.12
+          mylab_primary_ip: 10.10.50.12
+        leaf1-dc2.lab:
+          ansible_host: 192.168.50.51
+          mylab_mgmt_ip: 192.168.50.51
+          mylab_primary_ip: 10.20.50.11
+        leaf2-dc2.lab:
+          ansible_host: 192.168.50.52
+          mylab_mgmt_ip: 192.168.50.52
+          mylab_primary_ip: 10.20.50.12
     kubernetes:
       children:
         kube_control_plane:
           hosts:
-            prod1-cp1.dc1.lab: *id010
-            prod2-cp1.dc2.lab: *id011
+            prod1-cp1.dc1.lab:
+              ansible_host: 192.168.50.21
+              mylab_mgmt_ip: 192.168.50.21
+              mylab_primary_ip: 10.10.20.11
+            prod2-cp1.dc2.lab:
+              ansible_host: 192.168.50.61
+              mylab_mgmt_ip: 192.168.50.61
+              mylab_primary_ip: 10.20.20.11
         kube_workers:
           hosts:
-            prod1-w1.dc1.lab: *id012
-            prod1-w2.dc1.lab: *id013
-            prod2-w1.dc2.lab: *id014
-            prod2-w2.dc2.lab: *id015
+            prod1-w1.dc1.lab:
+              ansible_host: 192.168.50.31
+              mylab_mgmt_ip: 192.168.50.31
+              mylab_primary_ip: 10.10.20.21
+            prod1-w2.dc1.lab:
+              ansible_host: 192.168.50.32
+              mylab_mgmt_ip: 192.168.50.32
+              mylab_primary_ip: 10.10.20.22
+            prod2-w1.dc2.lab:
+              ansible_host: 192.168.50.71
+              mylab_mgmt_ip: 192.168.50.71
+              mylab_primary_ip: 10.20.20.21
+            prod2-w2.dc2.lab:
+              ansible_host: 192.168.50.72
+              mylab_mgmt_ip: 192.168.50.72
+              mylab_primary_ip: 10.20.20.22
     dc1:
       hosts:
-        bastion1.dc1.lab: *id001
-        prod1-cp1.dc1.lab: *id010
-        prod1-w1.dc1.lab: *id012
-        prod1-w2.dc1.lab: *id013
-        leaf1-dc1.lab: *id006
-        leaf2-dc1.lab: *id007
-        r1-dc1.lab: *id002
-        r2-dc1.lab: *id003
+        bastion1.dc1.lab:
+          ansible_host: 192.168.50.10
+          mylab_mgmt_ip: 192.168.50.10
+          mylab_primary_ip: 10.10.10.10
+        prod1-cp1.dc1.lab:
+          ansible_host: 192.168.50.21
+          mylab_mgmt_ip: 192.168.50.21
+          mylab_primary_ip: 10.10.20.11
+        prod1-w1.dc1.lab:
+          ansible_host: 192.168.50.31
+          mylab_mgmt_ip: 192.168.50.31
+          mylab_primary_ip: 10.10.20.21
+        prod1-w2.dc1.lab:
+          ansible_host: 192.168.50.32
+          mylab_mgmt_ip: 192.168.50.32
+          mylab_primary_ip: 10.10.20.22
+        leaf1-dc1.lab:
+          ansible_host: 192.168.50.11
+          mylab_mgmt_ip: 192.168.50.11
+          mylab_primary_ip: 10.10.50.11
+        leaf2-dc1.lab:
+          ansible_host: 192.168.50.12
+          mylab_mgmt_ip: 192.168.50.12
+          mylab_primary_ip: 10.10.50.12
+        r1-dc1.lab:
+          ansible_host: 192.168.50.1
+          mylab_mgmt_ip: 192.168.50.1
+          mylab_primary_ip: 10.10.50.1
+        r2-dc1.lab:
+          ansible_host: 192.168.50.2
+          mylab_mgmt_ip: 192.168.50.2
+          mylab_primary_ip: 10.10.50.2
     dc2:
       hosts:
-        prod2-cp1.dc2.lab: *id011
-        prod2-w1.dc2.lab: *id014
-        prod2-w2.dc2.lab: *id015
-        leaf1-dc2.lab: *id008
-        leaf2-dc2.lab: *id009
-        r1-dc2.lab: *id004
-        r2-dc2.lab: *id005
+        prod2-cp1.dc2.lab:
+          ansible_host: 192.168.50.61
+          mylab_mgmt_ip: 192.168.50.61
+          mylab_primary_ip: 10.20.20.11
+        prod2-w1.dc2.lab:
+          ansible_host: 192.168.50.71
+          mylab_mgmt_ip: 192.168.50.71
+          mylab_primary_ip: 10.20.20.21
+        prod2-w2.dc2.lab:
+          ansible_host: 192.168.50.72
+          mylab_mgmt_ip: 192.168.50.72
+          mylab_primary_ip: 10.20.20.22
+        leaf1-dc2.lab:
+          ansible_host: 192.168.50.51
+          mylab_mgmt_ip: 192.168.50.51
+          mylab_primary_ip: 10.20.50.11
+        leaf2-dc2.lab:
+          ansible_host: 192.168.50.52
+          mylab_mgmt_ip: 192.168.50.52
+          mylab_primary_ip: 10.20.50.12
+        r1-dc2.lab:
+          ansible_host: 192.168.50.41
+          mylab_mgmt_ip: 192.168.50.41
+          mylab_primary_ip: 10.20.50.1
+        r2-dc2.lab:
+          ansible_host: 192.168.50.42
+          mylab_mgmt_ip: 192.168.50.42
+          mylab_primary_ip: 10.20.50.2
