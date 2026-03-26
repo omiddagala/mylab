@@ -1,0 +1,7 @@
+Host *.lab 192.168.50.* 10.10.* 10.20.* 172.16.255.*
+    User debian
+    IdentityFile ~/.ssh/jmachine
+    IdentitiesOnly yes
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    LogLevel ERROR

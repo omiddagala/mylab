@@ -1,3 +1,16 @@
+## SSH behavior for mylab
+
+mylab VMs are ephemeral and may be rebuilt frequently. Rebuilt VMs generate new SSH host keys, so storing host keys in `~/.ssh/known_hosts` causes false host key mismatch errors.
+
+For this lab, SSH host key persistence is disabled for lab hosts by using:
+
+- `StrictHostKeyChecking no`
+- `UserKnownHostsFile /dev/null`
+
+This is acceptable for a disposable local lab, but must not be copied to production environments.
+
+
+
 Edit:
 
 hypervisor-ansible/inventories/prod/hosts.yml
@@ -31,7 +44,7 @@ Put your real public key there.
 
 You can get it with:
 
-cat ~/.ssh/id_ed25519.pub
+cat ~/.ssh/jmachine.pub
 Set the real uplink interface
 mylab_uplink_interface: enp0s31f6
 

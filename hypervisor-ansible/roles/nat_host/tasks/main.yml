@@ -1,0 +1,16 @@
+- name: Enable IP forwarding
+  ansible.builtin.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    state: present
+    reload: yes
+
+- name: Add NAT masquerade
+  ansible.builtin.command: iptables -t nat -C POSTROUTING -o {{ mylab_wan_interface }} -j MASQUERADE
+  register: nat_rule
+  failed_when: false
+  changed_when: false
+
+- name: Apply NAT rule
+  ansible.builtin.command: iptables -t nat -A POSTROUTING -o {{ mylab_wan_interface }} -j MASQUERADE
+  when: nat_rule.rc != 0
