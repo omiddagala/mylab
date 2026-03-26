@@ -1,156 +1,99 @@
 ---
-mylab_domain: lab
-mylab_environment: prod
-mylab_timezone: Europe/Amsterdam
-
-# First bootstrap user on fresh cloud images
 ansible_user: debian
 ansible_become: true
 ansible_python_interpreter: /usr/bin/python3
-ansible_ssh_private_key_file: ~/.ssh/jmachine
-ansible_ssh_common_args: >-
-  -o PreferredAuthentications=publickey
-  -o IdentitiesOnly=yes
-  -o StrictHostKeyChecking=no
-  -o UserKnownHostsFile=/dev/null
+ansible_ssh_private_key_file: "~/.ssh/jmachine"
+ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
-mylab_bastion_host: 192.168.50.10
-
-mylab_admin_group: adminops
-mylab_admin_users:
-  - name: automation
-    shell: /bin/bash
-    groups: ['sudo', '{{ mylab_admin_group }}']
-    ssh_authorized_keys:
-      - "{{ lookup('env', 'HOME') }}/.ssh/jmachine.pub"
-  - name: omid
-    shell: /bin/bash
-    groups: ['sudo', '{{ mylab_admin_group }}']
-    ssh_authorized_keys:
-      - "{{ lookup('env', 'HOME') }}/.ssh/jmachine.pub"
-
-mylab_disable_password_auth: true
-mylab_disable_root_ssh: true
-mylab_ssh_allow_tcp_forwarding: false
-mylab_ssh_allow_agent_forwarding: false
-
-mylab_manage_firewall: true
-mylab_operator_ssh_cidrs:
-  - 192.168.50.0/24
-mylab_allowed_ssh_sources:
-  - 192.168.50.10/32
-  - 192.168.50.0/24
+mylab_domain: lab
+mylab_timezone: Europe/Amsterdam
 
 mylab_dns_servers:
   - 1.1.1.1
-  - 9.9.9.9
+  - 8.8.8.8
 
 mylab_ntp_servers:
-  - time.cloudflare.com
   - pool.ntp.org
 
-mylab_apt_common_packages:
-  - apt-transport-https
-  - bash-completion
-  - ca-certificates
-  - chrony
-  - conntrack
-  - curl
-  - ethtool
-  - git
-  - gnupg
-  - htop
-  - ifupdown2
-  - iproute2
-  - ipset
-  - iptables
-  - iputils-ping
-  - jq
-  - lsb-release
-  - lsof
-  - ncdu
-  - net-tools
-  - nftables
-  - openssh-server
-  - rsync
-  - socat
+mylab_admin_user: automation
+mylab_admin_groups:
   - sudo
-  - tcpdump
-  - traceroute
-  - unzip
-  - vim
-  - wget
 
-mylab_journald_system_max_use: 1G
-mylab_journald_runtime_max_use: 256M
+mylab_disable_root_ssh: true
+mylab_password_authentication: false
+mylab_manage_ufw: false
 
-mylab_kernel_modules_common:
-  - br_netfilter
-  - overlay
-  - nf_conntrack
+mylab_kubernetes_version: v1.31.0
+mylab_pod_cidr: 10.244.0.0/16
+mylab_service_cidr: 10.96.0.0/12
+mylab_container_runtime: containerd
 
 mylab_sysctl_common:
-  fs.inotify.max_user_instances: 8192
-  fs.inotify.max_user_watches: 1048576
-  kernel.dmesg_restrict: 1
-  kernel.kptr_restrict: 2
-  kernel.panic: 10
-  kernel.panic_on_oops: 1
-  net.bridge.bridge-nf-call-ip6tables: 1
+  net.ipv4.ip_forward: 1
   net.bridge.bridge-nf-call-iptables: 1
-  net.ipv4.conf.all.accept_redirects: 0
-  net.ipv4.conf.all.log_martians: 1
+  net.bridge.bridge-nf-call-ip6tables: 1
   net.ipv4.conf.all.rp_filter: 0
-  net.ipv4.conf.default.accept_redirects: 0
-  net.ipv4.ip_forward: 1
-  net.ipv4.tcp_syncookies: 1
-  net.ipv6.conf.all.accept_redirects: 0
-  net.ipv6.conf.default.accept_redirects: 0
-  vm.max_map_count: 262144
-  vm.swappiness: 10
+  net.ipv4.conf.default.rp_filter: 0
 
-mylab_node_exporter_version: "1.8.2"
-mylab_node_exporter_user: node_exporter
-mylab_node_exporter_port: 9100
+mylab_common_packages:
+  - qemu-guest-agent
+  - curl
+  - wget
+  - vim
+  - git
+  - rsync
+  - sudo
+  - bash-completion
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - net-tools
+  - tcpdump
+  - jq
+  - unzip
 
-mylab_containerd_sandbox_image: registry.k8s.io/pause:3.10
+mylab_router_packages:
+  - frr
 
-mylab_kubernetes_modules:
-  - overlay
-  - br_netfilter
+mylab_bastion_packages:
+  - tmux
+  - htop
 
-mylab_kubernetes_sysctl:
-  net.bridge.bridge-nf-call-iptables: 1
-  net.bridge.bridge-nf-call-ip6tables: 1
-  net.ipv4.ip_forward: 1
+mylab_k8s_packages:
+  - apt-transport-https
 
-mylab_management_subnet: 192.168.50.0/24
+mylab_frr_defaults:
+  bgp_as_dc1: 65001
+  bgp_as_dc2: 65002
 
-mylab_vlan_definitions:
-  - { id: 10, name: management }
-  - { id: 20, name: prod1 }
-  - { id: 30, name: prod2 }
-  - { id: 50, name: storage }
-  - { id: 60, name: dmz }
-  - { id: 70, name: infra }
+mylab_ssh_hardening:
+  permit_root_login: "no"
+  password_authentication: "no"
+  pubkey_authentication: "yes"
+  challenge_response_authentication: "no"
+  use_pam: "yes"
+  x11_forwarding: "no"
+  allow_tcp_forwarding: "yes"
+  client_alive_interval: 300
+  client_alive_count_max: 2
 
-mylab_cluster_map:
-  prod1:
-    dc: dc1
-    control_plane:
-      - prod1-cp1.dc1.lab
-    workers:
-      - prod1-w1.dc1.lab
-      - prod1-w2.dc1.lab
-    pod_cidr: 10.244.0.0/16
-    service_cidr: 10.96.0.0/16
+# ---- required by keepalived_vrrp ----
+mylab_vrrp_auth_pass: "mylabvrrp42"
+mylab_vrrp_mgmt_vip: 192.168.50.254
+mylab_vrrp_dc1_infra_vip: 10.10.50.254
+mylab_vrrp_dc2_infra_vip: 10.20.50.254
 
-  prod2:
-    dc: dc2
-    control_plane:
-      - prod2-cp1.dc2.lab
-    workers:
-      - prod2-w1.dc2.lab
-      - prod2-w2.dc2.lab
-    pod_cidr: 10.245.0.0/16
-    service_cidr: 10.97.0.0/16
+# ---- required by router_frr ----
+mylab_inter_dc_enable_bgp: false
+mylab_bgp_asn_dc1: 65001
+mylab_bgp_asn_dc2: 65002
+mylab_bgp_rr_loopback_dc1: 10.255.0.1
+mylab_bgp_rr_loopback_dc2: 10.255.0.21
+
+# ---- required by router_nat ----
+mylab_nat_allowed_sources:
+  - 192.168.50.0/24
+  - 10.10.20.0/24
+  - 10.20.20.0/24
+  - 10.10.50.0/24
+  - 10.20.50.0/24

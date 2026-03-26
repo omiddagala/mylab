@@ -3,6 +3,7 @@
   hosts: hypervisors
   gather_facts: false
   become: false
+
   tasks:
     - name: Load VM definitions
       ansible.builtin.include_vars:
@@ -26,45 +27,23 @@
             | regex_replace('/.*$', '')
           }}
         ansible_user: "{{ mylab_guest_ansible_user | default(mylab_default_username) }}"
-        ansible_ssh_private_key_file: "{{ mylab_guest_ansible_private_key_file }}"
-        ansible_ssh_common_args: "{{ mylab_guest_ssh_common_args }}"
+        ansible_ssh_private_key_file: "{{ mylab_guest_ansible_private_key_file | default(lookup('env', 'HOME') ~ '/.ssh/jmachine') }}"
+        ansible_ssh_common_args: "{{ mylab_guest_ssh_common_args | default('-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null') }}"
       loop: "{{ mylab_ipam.vms }}"
       loop_control:
         label: "{{ item.name }}"
 
-- name: Harden guest VMs
+- name: Wait until guests are reachable
   hosts: guests
-  become: true
+  become: false
   gather_facts: false
-  pre_tasks:
+
+  tasks:
     - name: Wait for SSH on guests
       ansible.builtin.wait_for_connection:
         timeout: 600
         sleep: 5
 
-#    - name: Wait for SSH on guests again after first boot changes
-#      ansible.builtin.wait_for_connection:
-#        timeout: 600
-#        sleep: 5
-#
-#    - name: Wait for cloud-init to finish
-#      ansible.builtin.command: cloud-init status --wait
-#      changed_when: false
-#      failed_when: false
-#      retries: 20
-#      delay: 15
-#      register: cloudinit_wait
-#      until: cloudinit_wait is succeeded
-#    - name: Gather facts
-#      ansible.builtin.setup:
-
-  roles:
-    - common
-    - base_packages
-    - users
-    - sshd
-    - journald
-    - timesync
-    - unattended_upgrades
-    - sysctl
-    - nftables
+    - name: Wait for cloud-init to finish
+      ansible.builtin.raw: cloud-init status --wait || true
+      changed_when: false

@@ -9,6 +9,20 @@ For this lab, SSH host key persistence is disabled for lab hosts by using:
 
 This is acceptable for a disposable local lab, but must not be copied to production environments.
 
+******************************important***********************
+sudo sysctl -w net.ipv4.ip_forward=1
+echo "net.ipv4.ip_forward=1" | sudo tee /etc/sysctl.d/99-mylab.conf
+sudo sysctl -p /etc/sysctl.d/99-mylab.conf
+
+sudo iptables -t nat -A POSTROUTING -s 172.16.255.0/24 -o wlp0s20f3 -j MASQUERADE
+sudo iptables -A FORWARD -s 172.16.255.0/24 -o wlp0s20f3 -j ACCEPT
+sudo iptables -A FORWARD -d 172.16.255.0/24 -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+guest → router VIP .254 → router NAT to 172.16.255.x → hypervisor NAT to real internet
+
+
+
+
 
 
 Edit:
