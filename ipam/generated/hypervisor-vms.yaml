@@ -1,3 +1,4 @@
+---
 vms:
   - name: bastion1.dc1.lab
     role: bastion
@@ -8,9 +9,8 @@ vms:
     networks:
       - bridge: br-mgmt
         ip: 192.168.50.10/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.253
         default_route: true
-        route_metric: 100
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
@@ -25,19 +25,15 @@ vms:
     networks:
       - bridge: br-dc1
         ip: 10.10.20.11/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:0a:14:0b"
+        mac: "52:54:00:0a:14:0b"
       - bridge: br-mgmt
         ip: 192.168.50.21/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.253
         default_route: true
-        route_metric: 100
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:c0:a8:32:15"
+        mac: "52:54:00:c0:a8:15"
 
   - name: prod1-w1.dc1.lab
     role: k8s_worker
@@ -48,19 +44,15 @@ vms:
     networks:
       - bridge: br-dc1
         ip: 10.10.20.21/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:0a:14:15"
+        mac: "52:54:00:0a:14:15"
       - bridge: br-mgmt
         ip: 192.168.50.31/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.253
         default_route: true
-        route_metric: 100
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:c0:a8:32:1f"
+        mac: "52:54:00:c0:a8:1f"
 
   - name: prod1-w2.dc1.lab
     role: k8s_worker
@@ -71,19 +63,15 @@ vms:
     networks:
       - bridge: br-dc1
         ip: 10.10.20.22/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:0a:14:16"
+        mac: "52:54:00:0a:14:16"
       - bridge: br-mgmt
         ip: 192.168.50.32/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.253
         default_route: true
-        route_metric: 100
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:c0:a8:32:20"
+        mac: "52:54:00:c0:a8:20"
 
   - name: leaf1-dc1.lab
     role: leaf
@@ -94,19 +82,15 @@ vms:
     networks:
       - bridge: br-dc1
         ip: 10.10.50.11/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:0a:32:0b"
+        mac: "52:54:00:0a:32:0b"
       - bridge: br-mgmt
         ip: 192.168.50.11/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.253
         default_route: true
-        route_metric: 100
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:c0:a8:32:0b"
+        mac: "52:54:00:c0:a8:0b"
 
   - name: leaf2-dc1.lab
     role: leaf
@@ -117,19 +101,15 @@ vms:
     networks:
       - bridge: br-dc1
         ip: 10.10.50.12/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:0a:32:0c"
+        mac: "52:54:00:0a:32:0c"
       - bridge: br-mgmt
         ip: 192.168.50.12/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.253
         default_route: true
-        route_metric: 100
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:c0:a8:32:0c"
+        mac: "52:54:00:c0:a8:0c"
 
   - name: r1-dc1.lab
     role: router
@@ -140,21 +120,14 @@ vms:
     networks:
       - bridge: br-dc1
         ip: 10.10.50.1/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:0a:32:01"
+        mac: "52:54:00:0a:32:01"
       - bridge: br-mgmt
         ip: 192.168.50.1/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:c0:a8:32:01"
+        mac: "52:54:00:c0:a8:01"
       - bridge: br-wan
         ip: 172.16.255.11/24
         gateway: 172.16.255.1
         default_route: true
-        route_metric: 50
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
@@ -169,21 +142,14 @@ vms:
     networks:
       - bridge: br-dc1
         ip: 10.10.50.2/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:0a:32:02"
+        mac: "52:54:00:0a:32:02"
       - bridge: br-mgmt
         ip: 192.168.50.2/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:c0:a8:32:02"
+        mac: "52:54:00:c0:a8:02"
       - bridge: br-wan
         ip: 172.16.255.12/24
         gateway: 172.16.255.1
         default_route: true
-        route_metric: 50
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
@@ -198,19 +164,15 @@ vms:
     networks:
       - bridge: br-dc2
         ip: 10.20.20.11/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:14:14:0b"
+        mac: "52:54:00:0a:24:0b"
       - bridge: br-mgmt
         ip: 192.168.50.61/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.253
         default_route: true
-        route_metric: 100
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:c0:a8:32:3d"
+        mac: "52:54:00:c0:a8:3d"
 
   - name: prod2-w1.dc2.lab
     role: k8s_worker
@@ -221,19 +183,15 @@ vms:
     networks:
       - bridge: br-dc2
         ip: 10.20.20.21/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:14:14:15"
+        mac: "52:54:00:0a:24:15"
       - bridge: br-mgmt
         ip: 192.168.50.71/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.253
         default_route: true
-        route_metric: 100
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:c0:a8:32:47"
+        mac: "52:54:00:c0:a8:47"
 
   - name: prod2-w2.dc2.lab
     role: k8s_worker
@@ -244,19 +202,15 @@ vms:
     networks:
       - bridge: br-dc2
         ip: 10.20.20.22/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:14:14:16"
+        mac: "52:54:00:0a:24:16"
       - bridge: br-mgmt
         ip: 192.168.50.72/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.253
         default_route: true
-        route_metric: 100
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:c0:a8:32:48"
+        mac: "52:54:00:c0:a8:48"
 
   - name: leaf1-dc2.lab
     role: leaf
@@ -267,19 +221,15 @@ vms:
     networks:
       - bridge: br-dc2
         ip: 10.20.50.11/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:14:32:0b"
+        mac: "52:54:00:0a:34:0b"
       - bridge: br-mgmt
         ip: 192.168.50.51/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.253
         default_route: true
-        route_metric: 100
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:c0:a8:32:33"
+        mac: "52:54:00:c0:a8:33"
 
   - name: leaf2-dc2.lab
     role: leaf
@@ -290,19 +240,15 @@ vms:
     networks:
       - bridge: br-dc2
         ip: 10.20.50.12/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:14:32:0c"
+        mac: "52:54:00:0a:34:0c"
       - bridge: br-mgmt
         ip: 192.168.50.52/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.253
         default_route: true
-        route_metric: 100
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:c0:a8:32:34"
+        mac: "52:54:00:c0:a8:34"
 
   - name: r1-dc2.lab
     role: router
@@ -313,21 +259,14 @@ vms:
     networks:
       - bridge: br-dc2
         ip: 10.20.50.1/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:14:32:01"
+        mac: "52:54:00:0a:34:01"
       - bridge: br-mgmt
         ip: 192.168.50.41/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:c0:a8:32:29"
+        mac: "52:54:00:c0:a8:29"
       - bridge: br-wan
         ip: 172.16.255.21/24
         gateway: 172.16.255.1
         default_route: true
-        route_metric: 50
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
@@ -342,21 +281,14 @@ vms:
     networks:
       - bridge: br-dc2
         ip: 10.20.50.2/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:0a:14:32:02"
+        mac: "52:54:00:0a:34:02"
       - bridge: br-mgmt
         ip: 192.168.50.42/24
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
-        mac: "52:54:c0:a8:32:2a"
+        mac: "52:54:00:c0:a8:2a"
       - bridge: br-wan
         ip: 172.16.255.22/24
         gateway: 172.16.255.1
         default_route: true
-        route_metric: 50
         nameservers:
           - 1.1.1.1
           - 8.8.8.8

@@ -32,7 +32,7 @@ write_files:
     content: |
       [Service]
       ExecStart=
-      ExecStart=-/sbin/agetty -o '-p -- \\u' --keep-baud 115200,38400,9600 ttyS0 vt220
+      ExecStart=-/sbin/agetty -o '-p -- \u' --keep-baud 115200,38400,9600 ttyS0 vt220
 
 runcmd:
   - systemctl daemon-reload

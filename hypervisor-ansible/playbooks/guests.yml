@@ -26,7 +26,7 @@
             | regex_replace('/.*$', '')
           }}
         ansible_user: "{{ mylab_guest_ansible_user | default(mylab_default_username) }}"
-        ansible_ssh_private_key_file: "{{ mylab_guest_ansible_private_key_file | default(omit) }}"
+        ansible_ssh_private_key_file: "{{ mylab_guest_ansible_private_key_file }}"
         ansible_ssh_common_args: "{{ mylab_guest_ssh_common_args }}"
       loop: "{{ mylab_ipam.vms }}"
       loop_control:
@@ -35,11 +35,11 @@
 - name: Harden guest VMs
   hosts: guests
   become: true
-  gather_facts: true
+  gather_facts: false
   pre_tasks:
     - name: Wait for SSH on guests
       ansible.builtin.wait_for_connection:
-        timeout: 300
+        timeout: 600
         sleep: 5
 
     - name: Wait for cloud-init to finish
@@ -47,16 +47,8 @@
       changed_when: false
       failed_when: false
 
-    - name: Wait for dpkg/apt locks to clear
-      ansible.builtin.shell: |
-        while fuser /var/lib/dpkg/lock >/dev/null 2>&1 || \
-              fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 || \
-              fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do
-          sleep 3
-        done
-      args:
-        executable: /bin/bash
-      changed_when: false
+    - name: Gather facts
+      ansible.builtin.setup:
 
   roles:
     - common

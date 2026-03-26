@@ -2,10 +2,11 @@
 mylab_upstream_mode: routed
 mylab_uplink_interface: wlp0s20f3
 
-mylab_mgmt_bridge_cidr: 192.168.50.254/24
+# Host-side bridge IPs
+mylab_mgmt_bridge_cidr: 192.168.50.253/24
 mylab_wan_bridge_cidr: 172.16.255.1/24
-mylab_dc1_bridge_cidr: 10.10.50.254/24
-mylab_dc2_bridge_cidr: 10.20.50.254/24
+mylab_dc1_bridge_cidr: 10.10.50.253/24
+mylab_dc2_bridge_cidr: 10.20.50.253/24
 
 mylab_dns_servers:
   - 1.1.1.1
@@ -28,10 +29,9 @@ mylab_default_memory_mb: 2048
 mylab_default_disk_gb: 20
 mylab_default_username: debian
 
-# Controller-side SSH material used for cloud-init and later Ansible access.
-# Change these two paths if your key pair has a different name.
-mylab_ssh_public_key_file: "{{ lookup('env', 'HOME') + '/.ssh/id_ed25519.pub' }}"
-mylab_guest_ansible_private_key_file: "{{ lookup('env', 'HOME') + '/.ssh/id_ed25519' }}"
+# Use your real keypair here
+mylab_ssh_public_key_file: "{{ lookup('env', 'HOME') }}/.ssh/jmachine.pub"
+mylab_guest_ansible_private_key_file: "{{ lookup('env', 'HOME') }}/.ssh/jmachine"
 mylab_ssh_public_key: "{{ lookup('file', mylab_ssh_public_key_file) | trim }}"
 
 mylab_ipam_vm_file: "{{ playbook_dir }}/../../ipam/generated/hypervisor-vms.yaml"
