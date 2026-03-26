@@ -42,13 +42,21 @@
         timeout: 600
         sleep: 5
 
-    - name: Wait for cloud-init to finish
-      ansible.builtin.command: cloud-init status --wait
-      changed_when: false
-      failed_when: false
-
-    - name: Gather facts
-      ansible.builtin.setup:
+#    - name: Wait for SSH on guests again after first boot changes
+#      ansible.builtin.wait_for_connection:
+#        timeout: 600
+#        sleep: 5
+#
+#    - name: Wait for cloud-init to finish
+#      ansible.builtin.command: cloud-init status --wait
+#      changed_when: false
+#      failed_when: false
+#      retries: 20
+#      delay: 15
+#      register: cloudinit_wait
+#      until: cloudinit_wait is succeeded
+#    - name: Gather facts
+#      ansible.builtin.setup:
 
   roles:
     - common

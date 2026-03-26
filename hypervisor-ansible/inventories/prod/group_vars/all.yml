@@ -2,6 +2,7 @@
 mylab_upstream_mode: routed
 mylab_uplink_interface: wlp0s20f3
 mylab_wan_interface: wlp0s20f3
+mylab_timezone: Europe/Amsterdam
 
 # Host-side bridge IPs
 mylab_mgmt_bridge_cidr: 192.168.50.253/24
