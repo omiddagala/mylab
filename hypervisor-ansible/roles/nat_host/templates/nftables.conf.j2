@@ -1,0 +1,31 @@
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+table inet filter {
+  chain input {
+    type filter hook input priority filter; policy accept;
+  }
+
+  chain forward {
+    type filter hook forward priority filter; policy accept;
+    ct state established,related accept
+
+{% for iface in mylab_internal_bridge_ifaces %}
+    iifname "{{ iface }}" oifname "{{ mylab_uplink_interface }}" accept
+    iifname "{{ mylab_uplink_interface }}" oifname "{{ iface }}" ct state established,related accept
+{% endfor %}
+
+    iifname "br-wan" oifname { "br-dc1", "br-dc2", "br-mgmt" } accept
+    iifname { "br-dc1", "br-dc2", "br-mgmt" } oifname "br-wan" accept
+  }
+}
+
+table ip nat {
+  chain postrouting {
+    type nat hook postrouting priority srcnat; policy accept;
+{% for subnet in mylab_nat_source_subnets %}
+    oifname "{{ mylab_uplink_interface }}" ip saddr {{ subnet }} masquerade
+{% endfor %}
+  }
+}

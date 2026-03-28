@@ -1,30 +1,45 @@
----
-- name: Firewall baseline
-  hosts: linux
-  gather_facts: true
+- name: Wait for package manager readiness
+  hosts: all
   become: true
-  roles:
-    - nftables_base
+  gather_facts: false
+  tasks:
+    - name: Wait briefly for cloud-init to settle if present
+      ansible.builtin.shell: |
+        if command -v cloud-init >/dev/null 2>&1; then
+          cloud-init status --wait
+        else
+          exit 0
+        fi
+      args:
+        executable: /bin/bash
+      changed_when: false
+      failed_when: false
 
-- name: Bastion baseline
-  hosts: bastion
-  gather_facts: true
-  become: true
-  roles:
-    - bastion_base
+    - name: Stop apt-daily services if running
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+      loop:
+        - apt-daily.service
+        - apt-daily-upgrade.service
+      failed_when: false
+      changed_when: false
 
-- name: Routers
-  hosts: routers
-  gather_facts: true
-  become: true
-  roles:
-    - keepalived_vrrp
-    - router_frr
-    - router_nat
-
-- name: Leafs
-  hosts: leafs
-  gather_facts: true
-  become: true
-  roles:
-    - leaf_l3
+    - name: Wait until apt/dpkg locks are released
+      ansible.builtin.shell: |
+        timeout=900
+        interval=5
+        elapsed=0
+        while [ "$elapsed" -lt "$timeout" ]; do
+          if ! sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1 \
+             && ! sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 \
+             && ! sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1; then
+            exit 0
+          fi
+          sleep "$interval"
+          elapsed=$((elapsed + interval))
+        done
+        exit 1
+      args:
+        executable: /bin/bash
+      changed_when: false

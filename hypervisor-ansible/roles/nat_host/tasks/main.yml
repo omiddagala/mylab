@@ -1,16 +1,39 @@
-- name: Enable IP forwarding
-  ansible.builtin.sysctl:
-    name: net.ipv4.ip_forward
-    value: '1'
+---
+- name: Ensure procps is installed
+  ansible.builtin.package:
+    name: procps
     state: present
-    reload: yes
 
-- name: Add NAT masquerade
-  ansible.builtin.command: iptables -t nat -C POSTROUTING -o {{ mylab_wan_interface }} -j MASQUERADE
-  register: nat_rule
-  failed_when: false
+- name: Ensure nftables is installed
+  ansible.builtin.package:
+    name: nftables
+    state: present
+
+- name: Enable IPv4 forwarding at runtime
+  ansible.builtin.command: /usr/sbin/sysctl -w net.ipv4.ip_forward=1
   changed_when: false
 
-- name: Apply NAT rule
-  ansible.builtin.command: iptables -t nat -A POSTROUTING -o {{ mylab_wan_interface }} -j MASQUERADE
-  when: nat_rule.rc != 0
+- name: Persist IPv4 forwarding
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-mylab-ip-forward.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      net.ipv4.ip_forward = 1
+  notify: Reload sysctl
+
+- name: Render nftables configuration for host NAT
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart nftables
+
+- name: Ensure nftables service is enabled and started
+  ansible.builtin.service:
+    name: nftables
+    enabled: true
+    state: started

@@ -11,8 +11,6 @@
     - time_sync
     - journald
     - sysctl_tuning
-    - nftables_base
-    - node_exporter
 
 - name: Configure bastion
   hosts: bastion
@@ -21,7 +19,7 @@
   roles:
     - bastion_base
 
-- name: Configure routers
+- name: Configure routers first
   hosts: routers
   gather_facts: true
   become: true
@@ -30,12 +28,20 @@
     - router_frr
     - router_nat
 
-- name: Configure leafs
+- name: Configure leafs after routers
   hosts: leafs
   gather_facts: true
   become: true
   roles:
     - leaf_l3
+
+- name: Install firewall and exporter after routing exists
+  hosts: linux
+  gather_facts: true
+  become: true
+  roles:
+    - nftables_base
+    - node_exporter
 
 - name: Prepare kubernetes nodes
   hosts: kubernetes

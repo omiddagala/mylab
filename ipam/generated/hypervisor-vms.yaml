@@ -9,7 +9,7 @@ vms:
     networks:
       - bridge: br-mgmt
         ip: 192.168.50.10/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.1
         default_route: true
         nameservers:
           - 1.1.1.1
@@ -28,7 +28,7 @@ vms:
         mac: "52:54:00:0a:14:0b"
       - bridge: br-mgmt
         ip: 192.168.50.21/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.1
         default_route: true
         nameservers:
           - 1.1.1.1
@@ -47,7 +47,7 @@ vms:
         mac: "52:54:00:0a:14:15"
       - bridge: br-mgmt
         ip: 192.168.50.31/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.1
         default_route: true
         nameservers:
           - 1.1.1.1
@@ -66,7 +66,7 @@ vms:
         mac: "52:54:00:0a:14:16"
       - bridge: br-mgmt
         ip: 192.168.50.32/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.1
         default_route: true
         nameservers:
           - 1.1.1.1
@@ -85,7 +85,7 @@ vms:
         mac: "52:54:00:0a:32:0b"
       - bridge: br-mgmt
         ip: 192.168.50.11/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.1
         default_route: true
         nameservers:
           - 1.1.1.1
@@ -104,7 +104,7 @@ vms:
         mac: "52:54:00:0a:32:0c"
       - bridge: br-mgmt
         ip: 192.168.50.12/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.1
         default_route: true
         nameservers:
           - 1.1.1.1
@@ -131,7 +131,7 @@ vms:
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:ac:10:ff:0b"
+        mac: "52:54:00:ac:10:0b"
 
   - name: r2-dc1.lab
     role: router
@@ -153,7 +153,7 @@ vms:
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:ac:10:ff:0c"
+        mac: "52:54:00:ac:10:0c"
 
   - name: prod2-cp1.dc2.lab
     role: k8s_control_plane
@@ -167,7 +167,7 @@ vms:
         mac: "52:54:00:0a:24:0b"
       - bridge: br-mgmt
         ip: 192.168.50.61/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.1
         default_route: true
         nameservers:
           - 1.1.1.1
@@ -186,7 +186,7 @@ vms:
         mac: "52:54:00:0a:24:15"
       - bridge: br-mgmt
         ip: 192.168.50.71/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.1
         default_route: true
         nameservers:
           - 1.1.1.1
@@ -205,7 +205,7 @@ vms:
         mac: "52:54:00:0a:24:16"
       - bridge: br-mgmt
         ip: 192.168.50.72/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.1
         default_route: true
         nameservers:
           - 1.1.1.1
@@ -224,7 +224,7 @@ vms:
         mac: "52:54:00:0a:34:0b"
       - bridge: br-mgmt
         ip: 192.168.50.51/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.1
         default_route: true
         nameservers:
           - 1.1.1.1
@@ -243,7 +243,7 @@ vms:
         mac: "52:54:00:0a:34:0c"
       - bridge: br-mgmt
         ip: 192.168.50.52/24
-        gateway: 192.168.50.254
+        gateway: 192.168.50.1
         default_route: true
         nameservers:
           - 1.1.1.1
@@ -270,7 +270,7 @@ vms:
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:ac:10:ff:15"
+        mac: "52:54:00:ac:10:15"
 
   - name: r2-dc2.lab
     role: router
@@ -292,4 +292,4 @@ vms:
         nameservers:
           - 1.1.1.1
           - 8.8.8.8
-        mac: "52:54:ac:10:ff:16"
+        mac: "52:54:00:ac:10:16"

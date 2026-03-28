@@ -4,3 +4,4 @@
   become: true
   roles:
     - role: hypervisor_host
+    - role: nat_host

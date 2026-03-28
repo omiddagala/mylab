@@ -1,7 +1,7 @@
 ---
 mylab_upstream_mode: routed
-mylab_uplink_interface: wlp0s20f3
-mylab_wan_interface: wlp0s20f3
+mylab_uplink_interface: tun0
+mylab_wan_interface: tun0
 mylab_timezone: Europe/Amsterdam
 
 # Host-side bridge IPs
@@ -9,6 +9,20 @@ mylab_mgmt_bridge_cidr: 192.168.50.253/24
 mylab_wan_bridge_cidr: 172.16.255.1/24
 mylab_dc1_bridge_cidr: 10.10.50.253/24
 mylab_dc2_bridge_cidr: 10.20.50.253/24
+
+mylab_nat_source_subnets:
+  - 172.16.255.0/24
+  - 192.168.50.0/24
+  - 10.10.20.0/24
+  - 10.20.20.0/24
+  - 10.10.50.0/24
+  - 10.20.50.0/24
+
+mylab_internal_bridge_ifaces:
+  - br-mgmt
+  - br-wan
+  - br-dc1
+  - br-dc2
 
 mylab_dns_servers:
   - 1.1.1.1

@@ -1,0 +1,9 @@
+---
+- name: Reload sysctl
+  ansible.builtin.command: /usr/sbin/sysctl --system
+  changed_when: false
+
+- name: Restart nftables
+  ansible.builtin.service:
+    name: nftables
+    state: restarted
