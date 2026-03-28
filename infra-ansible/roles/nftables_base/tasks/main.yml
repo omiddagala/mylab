@@ -17,6 +17,16 @@
     group: root
     mode: "0755"
 
+- name: Ensure base include file exists
+  ansible.builtin.copy:
+    dest: /etc/nftables.d/00-base.nft
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # placeholder include file managed by Ansible
+  notify: Restart nftables
+
 - name: Build nftables rule set
   ansible.builtin.template:
     src: nftables.conf.j2

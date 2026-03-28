@@ -25,8 +25,15 @@ mylab_manage_ufw: false
 
 mylab_management_subnet: 192.168.50.0/24
 mylab_management_gateway: 192.168.50.1
+
+# Admin SSH entry points.
+mylab_operator_ssh_cidrs:
+  - 192.168.50.10/32
+
+# Default allowed SSH sources for non-bastion nodes.
 mylab_allowed_ssh_sources:
   - 192.168.50.10/32
+
 mylab_node_exporter_port: 9100
 
 mylab_kubernetes_version: v1.31.0

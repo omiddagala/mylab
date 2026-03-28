@@ -14,8 +14,11 @@
     owner: root
     group: root
     mode: "0644"
-    validate: "nft -c -f %s"
   notify: restart nftables
+
+- name: Validate full nftables configuration after NAT render
+  ansible.builtin.command: nft -c -f /etc/nftables.conf
+  changed_when: false
 
 - name: Ensure nftables service is enabled
   ansible.builtin.systemd:
