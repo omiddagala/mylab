@@ -1,0 +1,39 @@
+---
+- name: Harden guest VMs after router networking is available
+  hosts: guests
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Wait for SSH on guests
+      ansible.builtin.wait_for_connection:
+        timeout: 600
+        sleep: 5
+
+    - name: Wait for cloud-init to finish
+      ansible.builtin.command: cloud-init status --wait
+      changed_when: false
+      failed_when: false
+
+    - name: Wait for dpkg/apt locks to clear
+      ansible.builtin.shell: |
+        while fuser /var/lib/dpkg/lock >/dev/null 2>&1 || \
+              fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 || \
+              fuser /var/lib/apt/lists/lock >/dev/null 2>&1 || \
+              fuser /var/cache/apt/archives/lock >/dev/null 2>&1; do
+          sleep 5
+        done
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+  roles:
+    - common
+    - base_packages
+    - users
+    - sshd
+    - journald
+    - timesync
+    - unattended_upgrades
+    - sysctl
+    - nftables

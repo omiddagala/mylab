@@ -18,7 +18,9 @@
   gather_facts: true
   become: true
   roles:
+    - keepalived_vrrp
     - router_frr
+    - router_nat
 
 - name: Leafs
   hosts: leafs

@@ -44,6 +44,6 @@
         timeout: 600
         sleep: 5
 
-    - name: Wait for cloud-init to finish
-      ansible.builtin.raw: cloud-init status --wait || true
-      changed_when: false
+#    - name: Wait for cloud-init to finish
+#      ansible.builtin.raw: cloud-init status --wait || true
+#      changed_when: false
