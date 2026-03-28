@@ -1,19 +1,14 @@
 table ip mylab_nat {
   chain postrouting {
-    type nat hook postrouting priority srcnat; policy accept;
+    type nat hook postrouting priority srcnat;
+    policy accept;
 {% for src in mylab_nat_allowed_sources %}
     ip saddr {{ src }} oifname "{{ nat_outside_interface }}" masquerade
 {% endfor %}
   }
 
   chain forward {
-    type filter hook forward priority filter; policy drop;
-
-    ct state established,related accept
-
-{% for in_if in nat_inside_interfaces %}
-    iifname "{{ in_if }}" oifname "{{ nat_outside_interface }}" ip saddr { {% for src in mylab_nat_allowed_sources %}{{ src }}{% if not loop.last %}, {% endif %}{% endfor %} } accept
-    iifname "{{ nat_outside_interface }}" oifname "{{ in_if }}" ct state established,related accept
-{% endfor %}
+    type filter hook forward priority 0;
+    policy accept;
   }
 }

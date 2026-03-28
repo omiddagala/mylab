@@ -9,15 +9,26 @@
     name: nftables
     state: present
 
+- name: Ensure nftables include directory exists
+  ansible.builtin.file:
+    path: /etc/nftables.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
 - name: Build nftables rule set
   ansible.builtin.template:
     src: nftables.conf.j2
     dest: /etc/nftables.conf
+    owner: root
+    group: root
     mode: "0644"
+    validate: "nft -c -f %s"
   notify: Restart nftables
 
 - name: Ensure nftables is enabled
-  ansible.builtin.service:
+  ansible.builtin.systemd:
     name: nftables
     enabled: true
     state: started

@@ -1,7 +1,8 @@
+---
 - name: Wait for package manager readiness
-  hosts: all
-  become: true
+  hosts: linux
   gather_facts: false
+  become: true
   tasks:
     - name: Wait briefly for cloud-init to settle if present
       ansible.builtin.shell: |
@@ -30,16 +31,49 @@
         timeout=900
         interval=5
         elapsed=0
+
         while [ "$elapsed" -lt "$timeout" ]; do
-          if ! sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1 \
-             && ! sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 \
-             && ! sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1; then
+          if ! fuser /var/lib/dpkg/lock >/dev/null 2>&1 \
+             && ! fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 \
+             && ! fuser /var/lib/apt/lists/lock >/dev/null 2>&1; then
             exit 0
           fi
+
           sleep "$interval"
           elapsed=$((elapsed + interval))
         done
+
         exit 1
       args:
         executable: /bin/bash
       changed_when: false
+
+- name: Firewall baseline
+  hosts: linux
+  gather_facts: true
+  become: true
+  roles:
+    - nftables_base
+
+- name: Bastion baseline
+  hosts: bastion
+  gather_facts: true
+  become: true
+  roles:
+    - bastion_base
+
+- name: Configure routers first
+  hosts: routers
+  gather_facts: true
+  become: true
+  roles:
+    - keepalived_vrrp
+    - router_frr
+    - router_nat
+
+- name: Configure leafs
+  hosts: leafs
+  gather_facts: true
+  become: true
+  roles:
+    - leaf_l3
